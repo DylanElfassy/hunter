@@ -1,21 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Unbounded:wght@200..900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
+@layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Hunterz-specific variables */
+    --hunterz-pink: #FF00BB;
+    --hunterz-orange: #FF9D00;
+    --hunterz-black: #141318;
+    --hunterz-dark: #030102;
+    --hunterz-neutral: #F5F5F5;
+    --hunterz-grey: #252525;
+    --hunterz-text: #606060;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(99deg, #FF00BB -3.33%, #FF9D00 96.67%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    border-image: linear-gradient(99deg, #FF00BB -3.33%, #FF9D00 96.67%) 1;
+  }
+
+  .treasure-glow {
+    filter: drop-shadow(0 0 20px rgba(255, 0, 187, 0.3));
+  }
+
+  .timer-shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -23,4 +127,69 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.hero-container {
+  width: 96%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 16px;
+}
+
+/* .nav{
+  background-color: black;
+    border-radius: 10px;
+} */
+
+.object-cover {
+  height: 90% !important;
+}
+
+.map{
+  border-radius: 25px;
+  /* height: auto !important; */
+}
+
+.degrade{
+      width: 100%;
+    height: 90%;
+      border-radius: 25px;
+
+}
+
+.hero-text {
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 97%;
+  text-transform: uppercase;
+      width: 50%;
+    margin-right: auto;
+    margin-left: auto;
+    font-family: "Unbounded", sans-serif;;
+}
+
+.font-Unbounded{
+      font-family: "Unbounded", sans-serif;;
+
+}
+
+.font-Jakarta{
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.download-image{
+   transform: scale(1.1); 
+}
+
+.back-image {
+  background-image: url('../assets/Back.png');
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover; /* default up to 1279px */
+}
+
+@media (min-width: 1280px) {
+  .back-image {
+    background-size: contain; /* 1280px and wider */
+  }
 }
