@@ -15,16 +15,21 @@ const MapBackground = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/standard",
-      center: [2.2880, 48.857], // Shifted left of Eiffel Tower
-      zoom: 15.8,
-      pitch: 65,
-      bearing: -50,
-      interactive: false,
-      antialias: true,
-    });
+ const isMobile = window.innerWidth < 768; // Tailwind's md breakpoint
+  const centerCoords = isMobile
+    ? [2.2945, 48.8584] // Center on Eiffel Tower for mobile
+    : [2.2880, 48.857]; // Shifted left for desktop view
+
+  const map = new mapboxgl.Map({
+    container: mapContainer.current,
+    style: "mapbox://styles/mapbox/standard",
+center: centerCoords as mapboxgl.LngLatLike,
+    zoom: 15.8,
+    pitch: 65,
+    bearing: -50,
+    interactive: false,
+    antialias: true,
+  });
 
     map.on("style.load", () => {
       console.log("🗺️ Map style loaded");

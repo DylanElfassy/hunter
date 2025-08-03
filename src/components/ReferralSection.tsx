@@ -34,7 +34,7 @@ export const ReferralSection = () => {
     {/* Right Part with increased font size on mobile */}
 <div className="flex-1 text-left flex flex-col items-start pr-0 md:pr-40 md:max-w-[430px] text-lg md:text-base">
   <p className="font-Jakarta text-[#6B6B6B] max-w-sm mb-4">
-    Share your win on Instagram, TikTok, or Stories—and we’ll instantly top up your account with +20 XP.
+    Share your win on Instagram, TikTok, or Stories—and we&#39;ll instantly top up your account with +20 XP.
   </p>
   <div className="w-full flex justify-center md:justify-start">
     <button className="px-12 py-2 rounded-full text-white font-Jakarta text-base bg-gradient-to-r from-[#FF00BB] to-[#FF9D00] hover:brightness-110 transition-all">

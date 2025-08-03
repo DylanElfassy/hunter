@@ -24,7 +24,7 @@ const StepIntoGameSection: React.FC = () => (
         STEP INTO THE GAME
       </h2>
       <p className="text-hunterz-black font-Jakarta text-lg md:text-xl max-w-2xl mx-auto">
-        Your city just got a whole lot more exciting. Every day we hide real cash prizes around town—find them first and it's yours.
+        Your city just got a whole lot more exciting. Every day we hide real cash prizes around town—find them first and it&#39;s yours.
       </p>
     </div>
 
@@ -100,7 +100,7 @@ description={
 
       <StepCard
         title="Claim to Win & Share"
-        description="When you're inside the zone, launch our AR Mode, tap the capture the treasure, and watch your cash land in your wallet."
+        description="When you&#39;e inside the zone, launch our AR Mode, tap the capture the treasure, and watch your cash land in your wallet."
         contentClassName="mb-auto" 
         className="pb-0"
       >
