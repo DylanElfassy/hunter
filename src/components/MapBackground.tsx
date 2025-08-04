@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
-import treasureImg from "../assets/Treasure_Point_1.png";
+import treasureImg from "../assets/Treasure_1.png";
 import type { StaticImageData } from "next/image";
 import treasureImg_2 from "../assets/Treasure_Point_2.png";
 import treasureImg_3 from "../assets/Treasure_Point_3.png";
@@ -15,41 +15,57 @@ const MapBackground = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
- const isMobile = window.innerWidth < 768; // Tailwind's md breakpoint
-  const centerCoords = isMobile
-    ? [2.2945, 48.8584] // Center on Eiffel Tower for mobile
-    : [2.2880, 48.857]; // Shifted left for desktop view
+    const isMobile = window.innerWidth < 768;
+    const centerCoords = [-73.976, 40.769];
 
-  const map = new mapboxgl.Map({
-    container: mapContainer.current,
-    style: "mapbox://styles/mapbox/standard",
-center: centerCoords as mapboxgl.LngLatLike,
-    zoom: 15.8,
-    pitch: 65,
-    bearing: -50,
-    interactive: false,
-    antialias: true,
-  });
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/standard",
+      center: centerCoords as mapboxgl.LngLatLike,
+      zoom: 15,
+      pitch: 75,
+      bearing: -110,
+      interactive: true,
+      antialias: true,
+    });
 
     map.on("style.load", () => {
       console.log("🗺️ Map style loaded");
 
-      // Map visual config
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "lightPreset", "dawn");
+      map.setConfigProperty("basemap", "showRoadLabels", false);
+      map.setConfigProperty("basemap", "showTransitLabels", false);
+      map.setConfigProperty("basemap", "lightPreset", "dusk");
+      map.setConfigProperty("basemap", "show3dObjects", true);
 
-      // Treasure points
-      const treasurePoints: { coords: [number, number]; img: StaticImageData }[] = [
-        { coords: [2.2915, 48.8545], img: treasureImg },
-  { coords: [2.2835, 48.8545], img: treasureImg_2 },      // same vertical, more left horizontally
-        { coords: [2.29, 48.868], img: treasureImg_3 },
-      ];
+      // 🔁 Delayed auto-rotation (starts after 5 seconds)
+      setTimeout(() => {
+        let rotation = map.getBearing();
+        const rotateCamera = () => {
+          rotation = (rotation + 1) % 360; // Faster rotation
+          map.rotateTo(rotation, { duration: 0 });
+          requestAnimationFrame(rotateCamera);
+        };
+        rotateCamera();
+      }, 5000); // ⏱ 5-second delay
+
+      const treasurePoints: { coords: [number, number]; img: StaticImageData }[] = isMobile
+        ? [
+            { coords: [-73.9658, 40.7720], img: treasureImg },
+            { coords: [-73.9677, 40.7723], img: treasureImg_2 },
+            { coords: [-73.9638, 40.7683], img: treasureImg_3 },
+          ]
+        : [
+            { coords: [-73.9690, 40.7644], img: treasureImg },
+            { coords: [-73.9677, 40.7723], img: treasureImg_2 },
+            { coords: [-73.9774, 40.7794], img: treasureImg_3 },
+          ];
 
       treasurePoints.forEach(({ coords, img }) => {
         const el = document.createElement("div");
-        el.style.width = "150px";
-        el.style.height = "150px";
+        el.style.width = isMobile ? "100px" : "150px";
+        el.style.height = isMobile ? "100px" : "150px";
         el.style.backgroundImage = `url(${img.src})`;
         el.style.backgroundSize = "contain";
         el.style.backgroundRepeat = "no-repeat";
@@ -67,11 +83,9 @@ center: centerCoords as mapboxgl.LngLatLike,
       });
     });
 
-    // Cleanup on unmount
     return () => map.remove();
   }, []);
 
-  // Return JSX for the map container div with fixed height so map shows
   return (
     <div className="absolute w-full h-full z-0">
       <div ref={mapContainer} className="w-full h-full" />
