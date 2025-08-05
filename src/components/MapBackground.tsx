@@ -23,7 +23,7 @@ const MapBackground = () => {
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/standard",
       center: centerCoords as mapboxgl.LngLatLike,
-      zoom: 15,
+      zoom: 15.28,
       pitch: 75,
       bearing: -110,
       interactive: true,
@@ -35,7 +35,7 @@ const MapBackground = () => {
     let bearing = -110;
 
     const animate = () => {
-      bearing += 0.4;
+      bearing += 0.5;
       map.setBearing(bearing % 360);
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -45,7 +45,7 @@ const MapBackground = () => {
 
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", true);
+      map.setConfigProperty("basemap", "showRoadLabels", false);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
