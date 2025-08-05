@@ -45,7 +45,7 @@ const MapBackground = () => {
 
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", false);
+      map.setConfigProperty("basemap", "showRoadLabels", true);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
@@ -57,22 +57,32 @@ const MapBackground = () => {
 
       const treasurePoints: { coords: [number, number]; img: StaticImageData }[] = isMobile
         ? [
-            { coords: [-73.9658, 40.7720], img: treasureImg },
+            // { coords: [-73.9658, 40.7720], img: treasureImg },
+            // { coords: [-73.9677, 40.7723], img: treasureImg_2 },
+            // { coords: [-73.9638, 40.7683], img: treasureImg_3 },
+            { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-            { coords: [-73.9638, 40.7683], img: treasureImg_3 },
+            { coords: [-73.9774, 40.7794], img: treasureImg_2 },
+            { coords: [-73.9752, 40.758], img: treasureImg_4 },
+            { coords: [-73.9862, 40.7656], img: treasureImg },
+            { coords: [-73.9818, 40.7740], img: treasureImg_4 },
+            { coords: [-73.9785, 40.7639], img: treasureImg_3 },
           ]
         : [
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-            { coords: [-73.9774, 40.7794], img: treasureImg_3 },
+            { coords: [-73.9774, 40.7794], img: treasureImg_2 },
             { coords: [-73.9752, 40.758], img: treasureImg_4 },
             { coords: [-73.9862, 40.7656], img: treasureImg },
+            { coords: [-73.9818, 40.7740], img: treasureImg_4 },
+            { coords: [-73.9785, 40.7639], img: treasureImg_3 },
+
           ];
 
       treasurePoints.forEach(({ coords, img }) => {
         const el = document.createElement("div");
-        el.style.width = isMobile ? "100px" : "150px";
-        el.style.height = isMobile ? "100px" : "150px";
+        el.style.width = isMobile ? "125px" : "150px";
+        el.style.height = isMobile ? "125px" : "150px";
         el.style.backgroundImage = `url(${img.src})`;
         el.style.backgroundSize = "contain";
         el.style.backgroundRepeat = "no-repeat";
