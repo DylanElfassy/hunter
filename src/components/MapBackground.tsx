@@ -6,6 +6,7 @@ import treasureImg from "../assets/Treasure_1.png";
 import type { StaticImageData } from "next/image";
 import treasureImg_2 from "../assets/Treasure_Point_2.png";
 import treasureImg_3 from "../assets/Treasure_Point_3.png";
+import treasureImg_4 from "../assets/Treasure_Point_4.png";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
@@ -29,26 +30,30 @@ const MapBackground = () => {
       antialias: true,
     });
 
+    let animationFrameId: number;
+    let startTimeout: NodeJS.Timeout;
+    let bearing = -110;
+
+    const animate = () => {
+      bearing += 0.4;
+      map.setBearing(bearing % 360);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
     map.on("style.load", () => {
       console.log("🗺️ Map style loaded");
 
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", false);
+      map.setConfigProperty("basemap", "showRoadLabels", true);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
 
-      // 🔁 Delayed auto-rotation (starts after 5 seconds)
-      setTimeout(() => {
-        let rotation = map.getBearing();
-        const rotateCamera = () => {
-          rotation = (rotation + 1) % 360; // Faster rotation
-          map.rotateTo(rotation, { duration: 0 });
-          requestAnimationFrame(rotateCamera);
-        };
-        rotateCamera();
-      }, 5000); // ⏱ 5-second delay
+      // ⏱️ Start the bearing animation after 5 seconds
+      startTimeout = setTimeout(() => {
+        animate();
+      }, 5000);
 
       const treasurePoints: { coords: [number, number]; img: StaticImageData }[] = isMobile
         ? [
@@ -60,6 +65,8 @@ const MapBackground = () => {
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
             { coords: [-73.9774, 40.7794], img: treasureImg_3 },
+            { coords: [-73.9752, 40.758], img: treasureImg_4 },
+            { coords: [-73.9862, 40.7656], img: treasureImg },
           ];
 
       treasurePoints.forEach(({ coords, img }) => {
@@ -83,7 +90,12 @@ const MapBackground = () => {
       });
     });
 
-    return () => map.remove();
+    // ✅ Return a cleanup function to stop animation and remove the map
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(startTimeout);
+      map.remove();
+    };
   }, []);
 
   return (
