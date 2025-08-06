@@ -2,11 +2,12 @@
 
 import React, { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
-import treasureImg from "../assets/Treasure_1.png";
+import treasureImg from "../assets/Treasure1.1.png";
 import type { StaticImageData } from "next/image";
-import treasureImg_2 from "../assets/Treasure_Point_2.png";
-import treasureImg_3 from "../assets/Treasure_Point_3.png";
-import treasureImg_4 from "../assets/Treasure_Point_4.png";
+import treasureImg_2 from "../assets/XP2.png";
+import treasureImg_3 from "../assets/XP3.png";
+import treasureImg_4 from "../assets/XP4.png";
+import treasureImg_5 from "../assets/Treasure2.2.png";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
@@ -35,7 +36,7 @@ const MapBackground = () => {
     let bearing = -110;
 
     const animate = () => {
-      bearing += 0.5;
+      bearing += 0.3;
       map.setBearing(bearing % 360);
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -62,7 +63,7 @@ const MapBackground = () => {
             // { coords: [-73.9638, 40.7683], img: treasureImg_3 },
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-            { coords: [-73.9774, 40.7794], img: treasureImg_2 },
+            { coords: [-73.9774, 40.7794], img: treasureImg_5 },
             { coords: [-73.9752, 40.758], img: treasureImg_4 },
             { coords: [-73.9862, 40.7656], img: treasureImg },
             { coords: [-73.9818, 40.7740], img: treasureImg_4 },
@@ -71,18 +72,19 @@ const MapBackground = () => {
         : [
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-            { coords: [-73.9774, 40.7794], img: treasureImg_2 },
+            { coords: [-73.9774, 40.7794], img: treasureImg_5 },
             { coords: [-73.9752, 40.758], img: treasureImg_4 },
             { coords: [-73.9862, 40.7656], img: treasureImg },
-            { coords: [-73.9818, 40.7740], img: treasureImg_4 },
+            { coords: [-73.9818, 40.7740], img: treasureImg_2 },
             { coords: [-73.9785, 40.7639], img: treasureImg_3 },
+            { coords: [-73.9649, 40.7676], img: treasureImg_4 },
 
           ];
 
       treasurePoints.forEach(({ coords, img }) => {
         const el = document.createElement("div");
-        el.style.width = isMobile ? "125px" : "150px";
-        el.style.height = isMobile ? "125px" : "150px";
+        el.style.width = isMobile ? "125px" : "125px";
+        el.style.height = isMobile ? "125px" : "125px";
         el.style.backgroundImage = `url(${img.src})`;
         el.style.backgroundSize = "contain";
         el.style.backgroundRepeat = "no-repeat";
