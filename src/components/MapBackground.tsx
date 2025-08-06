@@ -68,6 +68,10 @@ const MapBackground = () => {
             { coords: [-73.9862, 40.7656], img: treasureImg },
             { coords: [-73.9818, 40.7740], img: treasureImg_4 },
             { coords: [-73.9785, 40.7639], img: treasureImg_3 },
+            { coords: [-73.9665, 40.7676], img: treasureImg_3 },
+            { coords: [-73.9707, 40.7842], img: treasureImg_4 },
+
+
           ]
         : [
             { coords: [-73.9690, 40.7644], img: treasureImg },
