@@ -46,7 +46,7 @@ const MapBackground = () => {
 
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", true);
+      map.setConfigProperty("basemap", "showRoadLabels", false);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
