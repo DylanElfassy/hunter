@@ -87,8 +87,8 @@ const MapBackground = () => {
 
       treasurePoints.forEach(({ coords, img }) => {
         const el = document.createElement("div");
-        el.style.width = isMobile ? "125px" : "125px";
-        el.style.height = isMobile ? "125px" : "125px";
+        el.style.width = isMobile ? "90px" : "125px";
+        el.style.height = isMobile ? "90px" : "125px";
         el.style.backgroundImage = `url(${img.src})`;
         el.style.backgroundSize = "contain";
         el.style.backgroundRepeat = "no-repeat";
