@@ -7,18 +7,18 @@ export const ReferralSection = () => {
   <div className="w-full bg-[#F5F5F5] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between relative overflow-visible">
     
     {/* Left Part with padding-left */}
-    <div className="lg:flex-1 text-left pl-4 lg:pl-12 mb-8 md:mb-8">
+    <div className="xl:flex-1 text-left pl-4 xl:pl-12 mb-8 md:mb-8">
       <h4 className="text-xl font-Jakarta bg-gradient-to-r from-[#FF00BB] to-[#FF9D00] text-transparent bg-clip-text mb-2 font-bold">
         Referral Program
       </h4>
-      <p className="text-black font-Unbounded text-3xl lg:text-4xl md:text-xl leading-snug max-w-md font-bold uppercase">
+      <p className="text-black font-Unbounded text-3xl xl:text-4xl md:text-xl leading-snug max-w-md font-bold uppercase">
         Share with pals and get +20XP free as a bonus
       </p>
     </div>
 
     {/* Middle Image */}
 <div 
-  className="lg:absolute lg:left-1/2 lg:top-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 z-0 md:w-[375px] lg:w-auto flex justify-center md:justify-start mb-8 lg:mb-0"
+  className="xl:absolute xl:left-1/2 xl:top-1/2 xl:transform xl:-translate-x-1/2 xl:-translate-y-1/2 z-0 md:w-[375px] xl:w-auto flex justify-center md:justify-start mb-8 xl:mb-0"
 >
   <Image
     src={referralImage}
@@ -30,7 +30,7 @@ export const ReferralSection = () => {
 </div>
 
     {/* Right Part with increased font size on mobile */}
-    <div className="lg:flex-1 text-left flex flex-col items-start pr-0 lg:pr-40 md:max-w-[430px] text-lg md:text-base mt-0 md:mt-8">
+    <div className="xl:flex-1 text-left flex flex-col items-start pr-0 xl:pr-40 md:max-w-[430px] text-lg md:text-base mt-0 md:mt-8">
       <p className="font-Jakarta text-[#6B6B6B] max-w-sm mb-4">
         Share your win on Instagram, TikTok, or Stories—and we&#39;ll instantly top up your account with +20 XP.
       </p>
