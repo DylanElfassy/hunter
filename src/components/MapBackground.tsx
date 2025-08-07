@@ -99,7 +99,7 @@ const MapBackground = () => {
         el.style.zIndex = "9999";
 
         new mapboxgl.Marker(el, {
-          offset: [0, -30],
+          offset: [0, -50],
         })
           .setLngLat(coords as mapboxgl.LngLatLike)
           .addTo(map);
