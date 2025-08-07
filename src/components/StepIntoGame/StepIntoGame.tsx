@@ -77,7 +77,6 @@ description={
       <strong className="font-bold">Need a boost?</strong> Spend XP to reveal a photo of an exact location — or reduce zone radius.
     </>
   }> 
- {/* Card Images */}
 <div className="flex flex-col justify-center items-center mt-6 w-full">
   <Image
     src={cardRose}
@@ -112,7 +111,7 @@ description={
     height={150}
     className="w-full max-w-[300px] max-h-[450px] h-auto z-[1]"
   />
- <div className="absolute bottom-61 left-1/2 transform -translate-x-1/2 z-0 w-[320px]">
+<div className="absolute bottom-[61px] md:bottom-[150px] left-1/2 transform -translate-x-1/2 z-0 w-[320px]">
     <Image
       src={confetti}
       alt="confetti"
@@ -123,59 +122,49 @@ description={
   </div>
 </div>
       </StepCard>
-
+ 
       <StepCard
         title="Connect & Earn"
         description="Rise up the real-world treasure leaderboard, swap tips in the community chat, and invite friends to score bonus cash and XP."
         className="!p-0 pb-40 min-h-[600px] md:min-h-[555px]"
         contentClassName="p-8 pb-0" 
       >
-<div className="relative min-h-[300px] md:min-h-[470px] overflow-visible md:overflow-hidden">
-  <div
-    className="absolute top-0 left-1/2 rounded-full"
-    style={{
-      width: '90vw',
-      maxWidth: '470px',
-      height: '90vw',
-      maxHeight: '470px',
-      transform: 'translateX(-50%)',
-background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
-}}
-  >
-<div
-  className="absolute top-1/2 left-1/2 rounded-full"
+<div className="relative min-h-[300px] md:min-h-[350px] lg:min-h-[470px] overflow-visible md:overflow-hidden">
+ <div
+  className="absolute top-0 left-1/2 rounded-full w-[90vw]  h-[90vw] sm:w-[90vw] sm:h-[90vw] md:w-[45vw] md:h-[45vw] max-w-[470px] max-h-[470px]"
   style={{
-    width: '55vw',
-    height: '55vw',
-    maxWidth: '325px',
-    maxHeight: '325px',
-    transform: 'translate(-50%, -50%)',
-    background: 'radial-gradient(circle, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%)',
+    transform: 'translateX(-50%)',
+    background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
   }}
 >
-      <div className="relative w-full h-full">
+  <div
+    className="absolute top-1/2 left-1/2 rounded-full w-[55vw] h-[55vw] sm:w-[55vw] sm:h-[55vw] md:w-[40vw] md:h-[40vw] max-w-[325px] max-h-[325px] transform -translate-x-1/2 -translate-y-1/2"
+    style={{
+      background: 'radial-gradient(circle, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%)',
+    }}
+  >
+    <div className="relative w-full h-full">
+      <Image
+        src={friends}
+        alt="Second Image"
+        layout="fill"
+        objectFit="contain"
+      />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <Image
-          src={friends}
-          alt="Second Image"
-          layout="fill"
-          objectFit="contain"
+          src={avatar}
+          alt="First Image"
+          width={125}
+          height={125}
+          className="object-contain"
         />
-
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <Image
-            src={avatar}
-            alt="First Image"
-            width={125}
-            height={125}
-            className="object-contain"
-          />
-        </div>
       </div>
     </div>
   </div>
 </div>
+</div>
 
-      </StepCard>
+      </StepCard> 
     </div>
   </section>
 );
