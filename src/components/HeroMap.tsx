@@ -21,9 +21,9 @@ const HeroMap = () => {
 
       {/* Hero Text and Buttons */}
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20 text-white text-center mt-32 w-[90%] sm:w-[70%] md:w-[50%] px-4">
-        <h1 className="font-bold uppercase font-Unbounded text-[25px] lg:text-[36px] xl:text-[46px]  leading-tight">
+        {/* <h1 className="font-bold uppercase font-Unbounded text-[25px] lg:text-[36px] xl:text-[46px]  leading-tight">
           Hunterz is a real-world money hunting game — chase clues, find the cash, win big.
-        </h1>
+        </h1> */}
 
         <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12">
           <a href="https://apps.apple.com/your-app-id" target="_blank" rel="noopener noreferrer">
