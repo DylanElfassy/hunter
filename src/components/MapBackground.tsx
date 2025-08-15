@@ -9,7 +9,8 @@ import treasureImg_3 from "../assets/XP3.png";
 import treasureImg_4 from "../assets/XP4.png";
 import treasureImg_5 from "../assets/Treasure2.2.png";
 
-mapboxgl.accessToken = "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
 const MapBackground = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -41,6 +42,8 @@ const MapBackground = () => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
+ 
+
     map.on("style.load", () => {
       console.log("🗺️ Map style loaded");
 
@@ -51,16 +54,14 @@ const MapBackground = () => {
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
 
-      // ⏱️ Start the bearing animation after 5 seconds
       startTimeout = setTimeout(() => {
         animate();
       }, 5000);
 
+        const altitude = 200; // meters above ground
+
       const treasurePoints: { coords: [number, number]; img: StaticImageData }[] = isMobile
         ? [
-            // { coords: [-73.9658, 40.7720], img: treasureImg },
-            // { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-            // { coords: [-73.9638, 40.7683], img: treasureImg_3 },
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
             { coords: [-73.9774, 40.7794], img: treasureImg_5 },
@@ -70,10 +71,9 @@ const MapBackground = () => {
             { coords: [-73.9785, 40.7639], img: treasureImg_3 },
             { coords: [-73.9665, 40.7676], img: treasureImg_3 },
             { coords: [-73.9707, 40.7842], img: treasureImg_4 },
-
-
           ]
         : [
+            // Manhattan
             { coords: [-73.9690, 40.7644], img: treasureImg },
             { coords: [-73.9677, 40.7723], img: treasureImg_2 },
             { coords: [-73.9774, 40.7794], img: treasureImg_5 },
@@ -83,6 +83,25 @@ const MapBackground = () => {
             { coords: [-73.9785, 40.7639], img: treasureImg_3 },
             { coords: [-73.9649, 40.7676], img: treasureImg_4 },
 
+            // Brooklyn
+            // { coords: [-73.9442, 40.6782], img: treasureImg_2 },
+            // { coords: [-73.9810, 40.6450], img: treasureImg_3 },
+            // { coords: [-73.9500, 40.6820], img: treasureImg_4 },
+
+            // Queens
+            // { coords: [-73.8500, 40.7420], img: treasureImg_5 },
+            // { coords: [-73.8700, 40.7500], img: treasureImg_2 },
+            // { coords: [-73.8200, 40.7350], img: treasureImg },
+
+            // Bronx
+            // { coords: [-73.8900, 40.8500], img: treasureImg_3 },
+            // { coords: [-73.8800, 40.8400], img: treasureImg_4 },
+            // { coords: [-73.9000, 40.8600], img: treasureImg_5 },
+
+            // Staten Island
+          //   { coords: [-74.1200, 40.5795], img: treasureImg_2 },
+          //   { coords: [-74.1500, 40.5700], img: treasureImg_3 },
+          //   { coords: [-74.1000, 40.5800], img: treasureImg_4 },
           ];
 
       treasurePoints.forEach(({ coords, img }) => {
@@ -106,7 +125,6 @@ const MapBackground = () => {
       });
     });
 
-    // ✅ Return a cleanup function to stop animation and remove the map
     return () => {
       cancelAnimationFrame(animationFrameId);
       clearTimeout(startTimeout);
