@@ -5,6 +5,8 @@ import mapboxgl from "mapbox-gl";
 import arButtonImg from "../assets/ar.jpeg";
 import locButtonImg from "../assets/loc.jpeg";
 
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
@@ -75,64 +77,58 @@ const MapBackground2: React.FC = () => {
   };
 
   // --- ROUTE WITH POINT MARKERS ---
- const addRoute = (points: RoutePoint[]) => {
-  if (!mapRef.current || points.length < 2) return;
+  const addRoute = (points: RoutePoint[]) => {
+    if (!mapRef.current || points.length < 2) return;
 
-  const map = mapRef.current;
+    const map = mapRef.current;
 
-  // Wait until style is fully loaded
-  if (!map.isStyleLoaded()) {
-    map.once("styledata", () => addRoute(points));
-    return;
-  }
+    if (!map.isStyleLoaded()) {
+      map.once("styledata", () => addRoute(points));
+      return;
+    }
 
-  // Remove previous route line and markers
-  if (map.getSource("route")) {
-    map.removeLayer("route");
-    map.removeSource("route");
-  }
-  routePointMarkersRef.current.forEach((m) => m.remove());
-  routePointMarkersRef.current = [];
+    if (map.getSource("route")) {
+      map.removeLayer("route");
+      map.removeSource("route");
+    }
 
-  // Create GeoJSON
-  const routeGeoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
-    type: "Feature",
-    geometry: { type: "LineString", coordinates: points.map((p) => p.coords) },
-    properties: {},
+    routePointMarkersRef.current.forEach((m) => m.remove());
+    routePointMarkersRef.current = [];
+
+    const routeGeoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
+      type: "Feature",
+      geometry: { type: "LineString", coordinates: points.map((p) => p.coords) },
+      properties: {},
+    };
+
+    map.addSource("route", { type: "geojson", data: routeGeoJSON });
+
+    const buildingLayer = map.getStyle().layers?.find((l) => l.type === "fill-extrusion")?.id;
+
+    map.addLayer(
+      {
+        id: "route",
+        type: "line",
+        source: "route",
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#000", "line-width": 6, "line-dasharray": [2, 4] },
+      },
+      buildingLayer
+    );
+
+    points.forEach((p) => {
+      const el = document.createElement("div");
+      el.style.width = "12px";
+      el.style.height = "12px";
+      el.style.backgroundColor = "#000";
+      el.style.borderRadius = "50%";
+      el.style.border = "2px solid white";
+      el.style.pointerEvents = "none";
+
+      const marker = new mapboxgl.Marker(el).setLngLat(p.coords).addTo(map);
+      routePointMarkersRef.current.push(marker);
+    });
   };
-
-  map.addSource("route", { type: "geojson", data: routeGeoJSON });
-
-  // Find first 3D building layer
-  const buildingLayer = map.getStyle().layers?.find((l) => l.type === "fill-extrusion")?.id;
-  
-  // Add line below buildings
-  map.addLayer(
-    {
-      id: "route",
-      type: "line",
-      source: "route",
-      layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": "#000", "line-width": 6, "line-dasharray": [2, 4] },
-    },
-    buildingLayer
-  );
-
-  // Add point markers
-  points.forEach((p) => {
-    const el = document.createElement("div");
-    el.style.width = "12px";
-    el.style.height = "12px";
-    el.style.backgroundColor = "#000";
-    el.style.borderRadius = "50%";
-    el.style.border = "2px solid white";
-    el.style.pointerEvents = "none";
-
-    const marker = new mapboxgl.Marker(el).setLngLat(p.coords).addTo(map);
-    routePointMarkersRef.current.push(marker);
-  });
-};
-
 
   // --- HANDLE UNITY MESSAGES ---
   const handleUnityMessage = (msg: string) => {
@@ -171,8 +167,54 @@ const MapBackground2: React.FC = () => {
       map.setConfigProperty("basemap", "showRoadLabels", false);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
-      map.setConfigProperty("basemap", "show3dObjects", true);
+      map.setConfigProperty("basemap", "show3dObjects", false);
     });
+
+    // Show 3D objects when zoomed in
+    map.on("zoom", () => {
+      if (map.getZoom() > 15) {
+        map.setConfigProperty("basemap", "show3dObjects", true);
+      } else {
+        map.setConfigProperty("basemap", "show3dObjects", false);
+      }
+    });
+
+    // --- Geolocate Control ---
+    const geolocateControl = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+      showUserHeading: true,
+    });
+    map.addControl(geolocateControl, "bottom-right");
+
+    // MutationObserver to style the Geolocate button
+    const observer = new MutationObserver(() => {
+      const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
+      console.log(button);
+      if (button) {
+        button.style.width = "64px";
+        button.style.height = "64px";
+        button.style.backgroundImage = `url(${locButtonImg.src})`;
+        button.style.backgroundSize = "cover";
+        button.style.backgroundPosition = "center";
+        button.style.borderRadius = "50%";
+        button.style.zIndex = "10000";
+        button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
+        button.style.border = "none";
+        observer.disconnect(); // Stop observing once styled
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    //   map.addControl(
+    //   new mapboxgl.GeolocateControl({
+    //     positionOptions: {
+    //       enableHighAccuracy: true
+    //     },
+    //     trackUserLocation: true,
+    //     showUserHeading: true
+    //   })
+    // );
 
     mapRef.current = map;
     window.handleUnityMessage = handleUnityMessage;
@@ -191,41 +233,13 @@ const MapBackground2: React.FC = () => {
 
       {/* AR Mode Button */}
       <button
-        onClick={() => {
-          window.Unity?.call(JSON.stringify({ type: "activateAR" }));
-        }}
+        onClick={() => window.Unity?.call(JSON.stringify({ type: "activateAR" }))}
         style={{
           backgroundImage: `url(${arButtonImg.src})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
         className="absolute bottom-24 right-4 w-16 h-16 rounded-full shadow-lg border-none cursor-pointer hover:scale-110 transition-transform"
-      />
-
-      {/* User Location Button */}
-      <button
-        onClick={() => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                const { latitude, longitude } = pos.coords;
-                mapRef.current?.flyTo({
-                  center: [longitude, latitude],
-                  zoom: 16,
-                  essential: true,
-                  speed: 1.2,
-                });
-              },
-              (err) => console.error("Geolocation error:", err)
-            );
-          }
-        }}
-        style={{
-          backgroundImage: `url(${locButtonImg.src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-        className="absolute bottom-4 right-4 w-16 h-16 rounded-full shadow-lg border-none cursor-pointer hover:scale-110 transition-transform"
       />
     </div>
   );
