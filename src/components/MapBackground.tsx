@@ -183,7 +183,7 @@ const MapBackground = () => {
     let bearing = -150;
 
     const animate = () => {
-      bearing += 0.3;
+      bearing += 0.2;
       map.setBearing(bearing % 360);
       animationFrameId = requestAnimationFrame(animate);
     };
