@@ -27,7 +27,7 @@ const UnitySimulator = () => {
     window.handleUnityMessage?.(
       JSON.stringify({ action: "add", markers: sampleMarkers })
     );
-    let js =    JSON.stringify({ action: "add", markers: sampleMarkers });
+    const js =    JSON.stringify({ action: "add", markers: sampleMarkers });
     console.log(js);
     console.log("➡️ Sent markers to MapBackground2:", sampleMarkers);
   };
