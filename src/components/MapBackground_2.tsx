@@ -5,7 +5,13 @@ import mapboxgl from "mapbox-gl";
 import arButtonImg from "../assets/ar.jpeg";
 import locButtonImg from "../assets/loc.jpeg";
 
-import 'mapbox-gl/dist/mapbox-gl.css';
+import treasureImg from "../assets/Treasure1.1.png";
+import treasureImg_2 from "../assets/XP2.png";
+import treasureImg_3 from "../assets/XP3.png";
+import treasureImg_4 from "../assets/XP4.png";
+import treasureImg_5 from "../assets/Treasure2.2.png";
+
+import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
@@ -18,10 +24,23 @@ declare global {
   }
 }
 
+// pool of treasure images
+const treasureImages = [
+  treasureImg,
+  treasureImg_2,
+  treasureImg_3,
+  treasureImg_4,
+  treasureImg_5,
+];
+
+const getRandomTreasureImage = () => {
+  const index = Math.floor(Math.random() * treasureImages.length);
+  return treasureImages[index].src;
+};
+
 interface MarkerData {
   id: string;
   coords: [number, number];
-  imgUrl: string;
 }
 
 interface RoutePoint {
@@ -37,24 +56,34 @@ const MapBackground2: React.FC = () => {
 
   // --- MARKERS ---
   const addMarkers = (markers: MarkerData[]) => {
-    if (!mapRef.current) return;
+  if (!mapRef.current) {
+    // notify Unity failure
+    window.Unity?.call(
+      JSON.stringify({ type: "markersAdded", success: false, reason: "map not ready" })
+    );
+    return false;
+  }
 
-    markers.forEach(({ id, coords, imgUrl }) => {
+  try {
+    markers.forEach(({ id, coords }) => {
+      // remove old marker if it exists
       if (markersRef.current[id]) {
         markersRef.current[id].remove();
         delete markersRef.current[id];
       }
 
+      const imgUrl = getRandomTreasureImage();
+
       const el = document.createElement("div");
       el.style.width = isMobile ? "90px" : "125px";
       el.style.height = isMobile ? "90px" : "125px";
-      el.style.backgroundImage = `url(${imgUrl})`;
+el.style.backgroundImage = `url(${imgUrl})`; 
       el.style.backgroundSize = "contain";
       el.style.backgroundRepeat = "no-repeat";
       el.style.backgroundPosition = "center";
       el.style.position = "absolute";
       el.style.top = "0px";
-      el.style.pointerEvents = "none";
+      el.style.pointerEvents = "auto";
       el.style.zIndex = "9999";
 
       el.addEventListener("click", () => {
@@ -67,7 +96,24 @@ const MapBackground2: React.FC = () => {
 
       markersRef.current[id] = marker;
     });
-  };
+
+    // ✅ notify Unity of success
+    window.Unity?.call(
+      JSON.stringify({ type: "markersAdded", success: true, count: markers.length })
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error adding markers:", err);
+
+    // ❌ notify Unity of failure
+    window.Unity?.call(
+      JSON.stringify({ type: "markersAdded", success: false, error: String(err) })
+    );
+
+    return false;
+  }
+};
 
   const removeMarker = (id: string) => {
     if (markersRef.current[id]) {
@@ -190,7 +236,6 @@ const MapBackground2: React.FC = () => {
     // MutationObserver to style the Geolocate button
     const observer = new MutationObserver(() => {
       const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
-      console.log(button);
       if (button) {
         button.style.width = "64px";
         button.style.height = "64px";
@@ -201,20 +246,10 @@ const MapBackground2: React.FC = () => {
         button.style.zIndex = "10000";
         button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
         button.style.border = "none";
-        observer.disconnect(); // Stop observing once styled
+        observer.disconnect();
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
-
-    //   map.addControl(
-    //   new mapboxgl.GeolocateControl({
-    //     positionOptions: {
-    //       enableHighAccuracy: true
-    //     },
-    //     trackUserLocation: true,
-    //     showUserHeading: true
-    //   })
-    // );
 
     mapRef.current = map;
     window.handleUnityMessage = handleUnityMessage;

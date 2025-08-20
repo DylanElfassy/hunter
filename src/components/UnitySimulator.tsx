@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import treasureImg_4 from "../assets/XP4.png";
-import treasureImg_5 from "../assets/Treasure2.2.png";
 
 declare global {
   interface Window {
@@ -19,22 +17,26 @@ const UnitySimulator = () => {
     };
   }, []);
 
-  // Sample markers
+  // Sample markers (no imgUrl now)
   const sampleMarkers = [
-    { id: "sim1", coords: [-73.9690, 40.7644], imgUrl: treasureImg_4.src },
-    { id: "sim2", coords: [-73.980, 40.770], imgUrl: treasureImg_5.src },
+    { id: "sim1", coords: [-73.9690, 40.7644] },
+    { id: "sim2", coords: [-73.980, 40.770] },
   ];
 
   const sendAddMarkers = () => {
     window.handleUnityMessage?.(
       JSON.stringify({ action: "add", markers: sampleMarkers })
     );
+    var js =    JSON.stringify({ action: "add", markers: sampleMarkers });
+    console.log(js);
+    console.log("➡️ Sent markers to MapBackground2:", sampleMarkers);
   };
 
   const sendRemoveMarker = (id: string) => {
     window.handleUnityMessage?.(
       JSON.stringify({ action: "remove", id })
     );
+    console.log(`➡️ Sent remove marker: ${id}`);
   };
 
   // --- New: Send route / direction test ---
@@ -49,7 +51,7 @@ const UnitySimulator = () => {
     window.handleUnityMessage?.(
       JSON.stringify({ action: "route", points: routePoints })
     );
-    console.log("Route test sent to MapBackground2");
+    console.log("➡️ Route test sent to MapBackground2");
   };
 
   return (
