@@ -5,7 +5,7 @@ import StepCard from "./StepCard";
 import ellipse from "../../assets/Ellipse_2.png"; // update path as needed
 import prizeIcon from "../../assets/Prize.png"; // update path as needed
 import timer from "../../assets/Timer.png"; // update path as needed
-import cardRose from "../../assets/Card-rose.png"; // update path as needed
+import cardRose from "../../assets/Rose.png"; // update path as needed
 import cardWhite from "../../assets/Card-White.png"; // update path as needed
 import phone from "../../assets/Telephone_1.png"; // update path as needed
 import confetti from "../../assets/Confetti.png"; // update path as needed

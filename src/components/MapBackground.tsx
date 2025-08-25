@@ -140,19 +140,393 @@
 // };
 
 // export default MapBackground;
+
+
+// "use client";
+
+// import React, { useRef, useEffect, useState } from "react";
+// import mapboxgl from "mapbox-gl";
+// import type { StaticImageData } from "next/image";
+// import type { FeatureCollection, Point } from "geojson";
+
+// // Images
+// import treasureImg from "../assets/Treasure1.1.png";
+// import treasureImg_2 from "../assets/XP2.png";
+// import treasureImg_3 from "../assets/XP3.png";
+// import treasureImg_4 from "../assets/XP4.png";
+// import treasureImg_5 from "../assets/Treasure2.2.png";
+
+// mapboxgl.accessToken =
+//   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
+
+// const MapBackground = () => {
+//   const mapContainer = useRef<HTMLDivElement | null>(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     if (!mapContainer.current) return;
+
+//     const isMobile = window.innerWidth < 768;
+//     const centerCoords = [-73.976, 40.766];
+
+//     const map = new mapboxgl.Map({
+//       container: mapContainer.current,
+//       style: "mapbox://styles/mapbox/standard",
+//       center: centerCoords as mapboxgl.LngLatLike,
+//       zoom: 15.25,
+//       pitch: 75,
+//       bearing: -150,
+//       interactive: true,
+//       antialias: true,
+//     });
+
+//     let animationFrameId: number;
+//     let startTimeout: NodeJS.Timeout;
+//     let bearing = -150;
+
+//     const animate = () => {
+//       bearing += 0.2;
+//       map.setBearing(bearing % 360);
+//       animationFrameId = requestAnimationFrame(animate);
+//     };
+
+//     map.on("style.load", () => {
+//       // Hide default labels
+//       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+//       map.setConfigProperty("basemap", "showPlaceLabels", false);
+//       map.setConfigProperty("basemap", "showRoadLabels", false);
+//       map.setConfigProperty("basemap", "showTransitLabels", false);
+
+//       // Style settings
+//       map.setConfigProperty("basemap", "lightPreset", "dusk");
+//       map.setConfigProperty("basemap", "show3dObjects", true);
+
+//       // Start rotation after delay
+//       startTimeout = setTimeout(animate, 8000);
+
+//       // -------------------------------
+//       // Treasure Data
+//       // -------------------------------
+//       const treasurePoints: { coords: [number, number]; img: StaticImageData }[] =
+//         [
+//           { coords: [-73.9690, 40.7644], img: treasureImg },
+//           { coords: [-73.9677, 40.7723], img: treasureImg_2 },
+//           { coords: [-73.9774, 40.7794], img: treasureImg_5 },
+//           { coords: [-73.9752, 40.7580], img: treasureImg_4 },
+//           { coords: [-73.9862, 40.7656], img: treasureImg },
+//           { coords: [-73.9818, 40.7740], img: treasureImg_2 },
+//           { coords: [-73.9785, 40.7639], img: treasureImg_3 },
+//           { coords: [-73.9649, 40.7676], img: treasureImg_4 },
+//           { coords: [-73.9442, 40.6782], img: treasureImg_2 },
+//           { coords: [-73.9810, 40.6450], img: treasureImg_3 },
+//           { coords: [-73.9500, 40.6820], img: treasureImg_4 },
+//           { coords: [-73.8500, 40.7420], img: treasureImg_5 },
+//           { coords: [-73.8700, 40.7500], img: treasureImg_2 },
+//           { coords: [-73.8200, 40.7350], img: treasureImg },
+//           { coords: [-73.8900, 40.8500], img: treasureImg_3 },
+//           { coords: [-73.8800, 40.8400], img: treasureImg_4 },
+//           { coords: [-73.9000, 40.8600], img: treasureImg_5 },
+//           { coords: [-74.1200, 40.5795], img: treasureImg_2 },
+//           { coords: [-74.1500, 40.5700], img: treasureImg_3 },
+//           { coords: [-74.1000, 40.5800], img: treasureImg_4 },
+//         ];
+
+//       const treasureGeoJSON: FeatureCollection<Point> = {
+//         type: "FeatureCollection",
+//         features: treasurePoints.map(({ coords, img }) => ({
+//           type: "Feature",
+//           properties: { img: img.src },
+//           geometry: { type: "Point", coordinates: coords },
+//         })),
+//       };
+
+//       map.addSource("treasures", {
+//         type: "geojson",
+//         data: treasureGeoJSON,
+//         cluster: true,
+//         clusterMaxZoom: 14,
+//         clusterRadius: 50,
+//       });
+
+//       map.addLayer({
+//         id: "clusters",
+//         type: "circle",
+//         source: "treasures",
+//         filter: ["has", "point_count"],
+//         paint: { "circle-color": "#FFD700", "circle-radius": 20 },
+//       });
+
+//       map.addLayer({
+//         id: "cluster-count",
+//         type: "symbol",
+//         source: "treasures",
+//         filter: ["has", "point_count"],
+//         layout: {
+//           "text-field": "{point_count_abbreviated}",
+//           "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+//           "text-size": 14,
+//         },
+//       });
+
+//       map.addLayer({
+//         id: "unclustered-point",
+//         type: "symbol",
+//         source: "treasures",
+//         filter: ["!", ["has", "point_count"]],
+//         layout: {
+//           "icon-image": ["concat", ["get", "img"], ""],
+//           "icon-size": isMobile ? 0.7 : 0.8,
+//         },
+//       });
+
+//       // Load images, then wait for idle
+//       const uniqueImages = [...new Set(treasurePoints.map((p) => p.img.src))];
+//       let loadedImages = 0;
+
+//       uniqueImages.forEach((src) => {
+//         map.loadImage(src, (error, image) => {
+//           if (error) throw error;
+//           if (!map.hasImage(src) && image) {
+//             map.addImage(src, image);
+//           }
+//           loadedImages++;
+//           if (loadedImages === uniqueImages.length) {
+//             // All images loaded → wait for map idle
+//             map.once("idle", () => {
+//               setTimeout(() => setLoading(false), 500); // short delay
+//             });
+//           }
+//         });
+//       });
+//     });
+
+//     return () => {
+//       cancelAnimationFrame(animationFrameId);
+//       clearTimeout(startTimeout);
+//       map.remove();
+//     };
+//   }, []);
+
+//   return (
+//     <div className="absolute w-full h-full z-0">
+//       {loading && (
+//   <div className="flex items-center justify-center w-full h-full bg-black text-white z-10 absolute transition-opacity duration-700">
+//     <span className="font-Unbounded text-3xl font-extrabold tracking-wide animate-pulse">
+//       HUNTERZ
+//     </span>
+//   </div>
+// )}
+
+//       <div
+//         ref={mapContainer}
+//         className={`w-full h-full transition-opacity duration-700 ${
+//           loading ? "opacity-0" : "opacity-100"
+//         }`}
+//       />
+//     </div>
+//   );
+// };
+
+// export default MapBackground;
+
+
+      // --- Three.js state ---
+//       let scene: THREE.Scene;
+//       let camera: THREE.Camera;
+//       let renderer: THREE.WebGLRenderer;
+
+//       const customLayer: mapboxgl.CustomLayerInterface = {
+//         id: "cube-marker",
+//         type: "custom",
+//         renderingMode: "3d",
+
+//         onAdd: (map, gl) => {
+//           scene = new THREE.Scene();
+//           camera = new THREE.Camera();
+
+//           renderer = new THREE.WebGLRenderer({
+//             canvas: map.getCanvas(),
+//             context: gl,
+//             antialias: true,
+//             alpha: true,
+//           });
+//           renderer.autoClear = false;
+
+//           const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+//           const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+//           dir.position.set(100, 200, 300);
+//           scene.add(ambient, dir);
+
+//           const mercator = mapboxgl.MercatorCoordinate.fromLngLat(
+//             { lng: TARGET_COORDS[0], lat: TARGET_COORDS[1] },
+//             ALTITUDE_M
+//           );
+// const scale = mercator.meterInMercatorCoordinateUnits();
+
+// const geometry = new THREE.BoxGeometry(20 * scale, 20 * scale, 20 * scale);
+// const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+// const cube = new THREE.Mesh(geometry, material);
+//      cube.position.set(mercator.x, mercator.y, mercator.z);
+//           scene.add(cube);
+
+//           scene.add(new THREE.AxesHelper(50));
+
+//           setLoading(false);
+
+//           spin();
+//         },
+
+//         render: (_gl, matrix) => {
+//           camera.projectionMatrix = new THREE.Matrix4().fromArray(matrix);
+//           renderer.state.reset();
+//           renderer.render(scene, camera);
+//           map.triggerRepaint();
+//         },
+//       };
+
+//       map.addLayer(customLayer);
+
+// "use client";
+
+// import React, { useEffect, useRef } from 'react';
+// import mapboxgl from 'mapbox-gl';
+// import 'mapbox-gl/dist/mapbox-gl.css';
+// import * as THREE from 'three';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+// const MapBackground: React.FC = () => {
+//   const mapContainerRef = useRef<HTMLDivElement>(null);
+//   const mapRef = useRef<mapboxgl.Map | null>(null);
+
+//   useEffect(() => {
+//     mapboxgl.accessToken =
+// 'pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg';
+//     const map = new mapboxgl.Map({
+//       container: mapContainerRef.current!,
+//       style: 'mapbox://styles/mapbox/standard',
+//       zoom: 18,
+//       center: [-73.969, 40.7644], // NYC coordinates
+//       pitch: 60,
+//       antialias: true
+//     });
+
+//     const modelOrigin: [number, number] = [-73.969, 40.7644]; // NYC
+//     const modelAltitude = 100;
+//     const modelRotate = [Math.PI / 2, 0, 0];
+
+//     const modelAsMercatorCoordinate = mapboxgl.MercatorCoordinate.fromLngLat(
+//       modelOrigin,
+//       modelAltitude
+//     );
+
+//     const modelTransform = {
+//       translateX: modelAsMercatorCoordinate.x,
+//       translateY: modelAsMercatorCoordinate.y,
+//       translateZ: modelAsMercatorCoordinate.z,
+//       rotateX: modelRotate[0],
+//       rotateY: modelRotate[1],
+//       rotateZ: modelRotate[2],
+//       scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits()*100
+//     };
+
+//     const createCustomLayer = (map: mapboxgl.Map): mapboxgl.CustomLayerInterface => {
+//       const camera = new THREE.Camera();
+//       const scene = new THREE.Scene();
+
+//       const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
+//       directionalLight1.position.set(0, -70, 100).normalize();
+//       scene.add(directionalLight1);
+
+//       const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+//       directionalLight2.position.set(0, 70, 100).normalize();
+//       scene.add(directionalLight2);
+
+// const loader = new GLTFLoader();
+// loader.load(
+//   '/models/treasure_chest.glb',  // path relative to public folder
+//   (gltf) => {
+//     scene.add(gltf.scene);
+//   },
+//   undefined,
+//   (error) => {
+//     console.error('Error loading GLB model:', error);
+//   }
+// );
+
+//       const renderer = new THREE.WebGLRenderer({
+//         canvas: map.getCanvas(),
+//         context: map.painter.context.gl,
+//         antialias: true
+//       });
+//       renderer.autoClear = false;
+
+//       return {
+//         id: '3d-model',
+//         type: 'custom', // must be literal "custom"
+//         renderingMode: '3d',
+//         onAdd: () => {},
+//         render: (_gl: WebGLRenderingContext, matrix: number[]) => {
+//           const rotationX = new THREE.Matrix4().makeRotationAxis(
+//             new THREE.Vector3(1, 0, 0),
+//             modelTransform.rotateX
+//           );
+//           const rotationY = new THREE.Matrix4().makeRotationAxis(
+//             new THREE.Vector3(0, 1, 0),
+//             modelTransform.rotateY
+//           );
+//           const rotationZ = new THREE.Matrix4().makeRotationAxis(
+//             new THREE.Vector3(0, 0, 1),
+//             modelTransform.rotateZ
+//           );
+
+//           const m = new THREE.Matrix4().fromArray(matrix);
+//           const l = new THREE.Matrix4()
+//             .makeTranslation(
+//               modelTransform.translateX,
+//               modelTransform.translateY,
+//               modelTransform.translateZ
+//             )
+//             .scale(
+//               new THREE.Vector3(
+//                 modelTransform.scale,
+//                 -modelTransform.scale,
+//                 modelTransform.scale
+//               )
+//             )
+//             .multiply(rotationX)
+//             .multiply(rotationY)
+//             .multiply(rotationZ);
+
+//           camera.projectionMatrix = m.multiply(l);
+//           renderer.resetState();
+//           renderer.render(scene, camera);
+//           map.triggerRepaint();
+//         }
+//       };
+//     };
+
+//     map.on('style.load', () => {
+//       const customLayer = createCustomLayer(map);
+//       map.addLayer(customLayer);
+//     });
+
+//     mapRef.current = map;
+
+//     return () => map.remove();
+//   }, []);
+
+//   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
+// };
+
+// export default MapBackground;
+
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import type { StaticImageData } from "next/image";
-import type { FeatureCollection, Point } from "geojson";
-
-// Images
-import treasureImg from "../assets/Treasure1.1.png";
-import treasureImg_2 from "../assets/XP2.png";
-import treasureImg_3 from "../assets/XP3.png";
-import treasureImg_4 from "../assets/XP4.png";
-import treasureImg_5 from "../assets/Treasure2.2.png";
+import "mapbox-gl/dist/mapbox-gl.css";
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
@@ -164,13 +538,10 @@ const MapBackground = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const isMobile = window.innerWidth < 768;
-    const centerCoords = [-73.976, 40.766];
-
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/standard",
-      center: centerCoords as mapboxgl.LngLatLike,
+      center: [-73.976, 40.766],
       zoom: 15.25,
       pitch: 75,
       bearing: -150,
@@ -178,6 +549,181 @@ const MapBackground = () => {
       antialias: true,
     });
 
+    // -----------------------------
+    // All treasure coordinates
+    // -----------------------------
+    const treasureCoords: [number, number][] = [
+      [-73.9690, 40.7644],
+      [-73.9677, 40.7723],
+      [-73.9774, 40.7794],
+      [-73.9752, 40.7580],
+      [-73.9862, 40.7656],
+      [-73.9818, 40.7740],
+      [-73.9785, 40.7639],
+      [-73.9649, 40.7676],
+      [-73.9442, 40.6782],
+      [-73.9810, 40.6450],
+      [-73.9500, 40.6820],
+      [-73.8500, 40.7420],
+      [-73.8700, 40.7500],
+      [-73.8200, 40.7350],
+      [-73.8900, 40.8500],
+      [-73.8800, 40.8400],
+      [-73.9000, 40.8600],
+      [-74.1200, 40.5795],
+      [-74.1500, 40.5700],
+      [-74.1000, 40.5800],
+    ];
+
+    // -----------------------------
+    // Model configurations
+    // -----------------------------
+    type ModelType = "Dollar_Box_Open" | "Black_XP";
+
+    const modelConfigs: {
+      [key in ModelType]: { url: string; scaleMultiplier: number; rotate: [number, number, number] };
+    } = {
+      Dollar_Box_Open: {
+        url: "/models/Dollar_Box_Open.glb",
+        scaleMultiplier: 35,
+        rotate: [Math.PI / 2, Math.PI, 0],
+      },
+      Black_XP: {
+        url: "/models/Black_XP.glb",
+        scaleMultiplier: 925,
+        rotate: [Math.PI / 2, Math.PI, 0], // rotate as needed
+      },
+    };
+
+    // -----------------------------
+    // Build models array with random type
+    // -----------------------------
+    const models = treasureCoords.map((coords, idx) => {
+      const type: ModelType = Math.random() < 0.5 ? "Dollar_Box_Open" : "Black_XP";
+      const cfg = modelConfigs[type];
+      return {
+        id: `3d-model-${idx}`,
+        origin: coords,
+        altitude: 120,
+        url: cfg.url,
+        scaleMultiplier: cfg.scaleMultiplier,
+        rotate: cfg.rotate,
+      };
+    });
+
+    // -----------------------------
+    // Function to create a custom layer per model
+    // -----------------------------
+    const createCustomLayer = (
+      map: mapboxgl.Map,
+      model: typeof models[number]
+    ): mapboxgl.CustomLayerInterface => {
+      const camera = new THREE.Camera();
+      const scene = new THREE.Scene();
+
+      // Lighting
+      const light1 = new THREE.DirectionalLight(0xffffff, 1);
+      light1.position.set(0, -70, 100).normalize();
+      scene.add(light1);
+
+      const light2 = new THREE.DirectionalLight(0xffffff, 1);
+      light2.position.set(0, 70, 100).normalize();
+      scene.add(light2);
+
+      // Transform
+      const merc = mapboxgl.MercatorCoordinate.fromLngLat(model.origin, model.altitude);
+      const transform = {
+        translateX: merc.x,
+        translateY: merc.y,
+        translateZ: merc.z,
+        rotateX: model.rotate[0],
+        rotateY: model.rotate[1],
+        rotateZ: model.rotate[2],
+        scale: merc.meterInMercatorCoordinateUnits() * model.scaleMultiplier,
+      };
+
+      // Load model
+      const loader = new GLTFLoader();
+      loader.load(
+        model.url,
+        (gltf) => {
+          const obj = gltf.scene;
+          (obj as any).transform = transform;
+
+          // ✅ Make sure both sides render
+          obj.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              const mesh = child as THREE.Mesh;
+              const mat = mesh.material;
+              if (Array.isArray(mat)) {
+                mat.forEach((m) => (m.side = THREE.DoubleSide));
+              } else {
+                mat.side = THREE.DoubleSide;
+              }
+              // recompute normals if necessary
+              mesh.geometry.computeVertexNormals();
+            }
+          });
+
+          scene.add(obj);
+        },
+        undefined,
+        (err) => console.error("Error loading model:", err)
+      );
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: map.getCanvas(),
+        context: (map as any).painter.context.gl,
+        antialias: true,
+      });
+      renderer.autoClear = false;
+
+      return {
+        id: model.id,
+        type: "custom",
+        renderingMode: "3d",
+        onAdd: () => {},
+        render: (_gl, matrix) => {
+          const m = new THREE.Matrix4().fromArray(matrix);
+
+          scene.traverse((obj) => {
+            if ((obj as any).transform) {
+              const t = (obj as any).transform;
+
+              const rotationX = new THREE.Matrix4().makeRotationAxis(
+                new THREE.Vector3(1, 0, 0),
+                t.rotateX
+              );
+              const rotationY = new THREE.Matrix4().makeRotationAxis(
+                new THREE.Vector3(0, 1, 0),
+                t.rotateY
+              );
+              const rotationZ = new THREE.Matrix4().makeRotationAxis(
+                new THREE.Vector3(0, 0, 1),
+                t.rotateZ
+              );
+
+              const l = new THREE.Matrix4()
+                .makeTranslation(t.translateX, t.translateY, t.translateZ)
+                .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
+                .multiply(rotationX)
+                .multiply(rotationY)
+                .multiply(rotationZ);
+
+              camera.projectionMatrix = m.clone().multiply(l);
+            }
+          });
+
+          renderer.resetState();
+          renderer.render(scene, camera);
+          map.triggerRepaint();
+        },
+      };
+    };
+
+    // -----------------------------
+    // Animate map bearing
+    // -----------------------------
     let animationFrameId: number;
     let startTimeout: NodeJS.Timeout;
     let bearing = -150;
@@ -189,112 +735,20 @@ const MapBackground = () => {
     };
 
     map.on("style.load", () => {
-      // Hide default labels
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
       map.setConfigProperty("basemap", "showPlaceLabels", false);
       map.setConfigProperty("basemap", "showRoadLabels", false);
       map.setConfigProperty("basemap", "showTransitLabels", false);
 
-      // Style settings
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
 
-      // Start rotation after delay
       startTimeout = setTimeout(animate, 8000);
+      setTimeout(() => setLoading(false), 5000);
 
-      // -------------------------------
-      // Treasure Data
-      // -------------------------------
-      const treasurePoints: { coords: [number, number]; img: StaticImageData }[] =
-        [
-          { coords: [-73.9690, 40.7644], img: treasureImg },
-          { coords: [-73.9677, 40.7723], img: treasureImg_2 },
-          { coords: [-73.9774, 40.7794], img: treasureImg_5 },
-          { coords: [-73.9752, 40.7580], img: treasureImg_4 },
-          { coords: [-73.9862, 40.7656], img: treasureImg },
-          { coords: [-73.9818, 40.7740], img: treasureImg_2 },
-          { coords: [-73.9785, 40.7639], img: treasureImg_3 },
-          { coords: [-73.9649, 40.7676], img: treasureImg_4 },
-          { coords: [-73.9442, 40.6782], img: treasureImg_2 },
-          { coords: [-73.9810, 40.6450], img: treasureImg_3 },
-          { coords: [-73.9500, 40.6820], img: treasureImg_4 },
-          { coords: [-73.8500, 40.7420], img: treasureImg_5 },
-          { coords: [-73.8700, 40.7500], img: treasureImg_2 },
-          { coords: [-73.8200, 40.7350], img: treasureImg },
-          { coords: [-73.8900, 40.8500], img: treasureImg_3 },
-          { coords: [-73.8800, 40.8400], img: treasureImg_4 },
-          { coords: [-73.9000, 40.8600], img: treasureImg_5 },
-          { coords: [-74.1200, 40.5795], img: treasureImg_2 },
-          { coords: [-74.1500, 40.5700], img: treasureImg_3 },
-          { coords: [-74.1000, 40.5800], img: treasureImg_4 },
-        ];
-
-      const treasureGeoJSON: FeatureCollection<Point> = {
-        type: "FeatureCollection",
-        features: treasurePoints.map(({ coords, img }) => ({
-          type: "Feature",
-          properties: { img: img.src },
-          geometry: { type: "Point", coordinates: coords },
-        })),
-      };
-
-      map.addSource("treasures", {
-        type: "geojson",
-        data: treasureGeoJSON,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50,
-      });
-
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "treasures",
-        filter: ["has", "point_count"],
-        paint: { "circle-color": "#FFD700", "circle-radius": 20 },
-      });
-
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "treasures",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 14,
-        },
-      });
-
-      map.addLayer({
-        id: "unclustered-point",
-        type: "symbol",
-        source: "treasures",
-        filter: ["!", ["has", "point_count"]],
-        layout: {
-          "icon-image": ["concat", ["get", "img"], ""],
-          "icon-size": isMobile ? 0.7 : 0.8,
-        },
-      });
-
-      // Load images, then wait for idle
-      const uniqueImages = [...new Set(treasurePoints.map((p) => p.img.src))];
-      let loadedImages = 0;
-
-      uniqueImages.forEach((src) => {
-        map.loadImage(src, (error, image) => {
-          if (error) throw error;
-          if (!map.hasImage(src) && image) {
-            map.addImage(src, image);
-          }
-          loadedImages++;
-          if (loadedImages === uniqueImages.length) {
-            // All images loaded → wait for map idle
-            map.once("idle", () => {
-              setTimeout(() => setLoading(false), 500); // short delay
-            });
-          }
-        });
+      models.forEach((m) => {
+        const layer = createCustomLayer(map, m);
+        map.addLayer(layer);
       });
     });
 
@@ -308,13 +762,12 @@ const MapBackground = () => {
   return (
     <div className="absolute w-full h-full z-0">
       {loading && (
-  <div className="flex items-center justify-center w-full h-full bg-black text-white z-10 absolute transition-opacity duration-700">
-    <span className="font-Unbounded text-3xl font-extrabold tracking-wide animate-pulse">
-      HUNTERZ
-    </span>
-  </div>
-)}
-
+        <div className="flex items-center justify-center w-full h-full bg-black text-white z-10 absolute transition-opacity duration-700">
+          <span className="font-Unbounded text-3xl font-extrabold tracking-wide animate-pulse">
+            HUNTERZ
+          </span>
+        </div>
+      )}
       <div
         ref={mapContainer}
         className={`w-full h-full transition-opacity duration-700 ${
