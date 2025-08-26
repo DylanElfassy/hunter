@@ -519,7 +519,6 @@
 // };
 
 // export default MapBackground;
-
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -585,12 +584,12 @@ const MapBackground = () => {
     } = {
       Dollar_Box_Open: {
         url: "/models/Dollar_Box_Open.glb",
-        scaleMultiplier: 35,
+        scaleMultiplier: 30,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP: {
         url: "/models/Black_XP.glb",
-        scaleMultiplier: 925,
+        scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0], // rotate as needed
       },
     };
@@ -648,6 +647,7 @@ const MapBackground = () => {
         model.url,
         (gltf) => {
           const obj = gltf.scene;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (obj as any).transform = transform;
 
           // ✅ Make sure both sides render
@@ -660,7 +660,6 @@ const MapBackground = () => {
               } else {
                 mat.side = THREE.DoubleSide;
               }
-              // recompute normals if necessary
               mesh.geometry.computeVertexNormals();
             }
           });
@@ -673,6 +672,7 @@ const MapBackground = () => {
 
       const renderer = new THREE.WebGLRenderer({
         canvas: map.getCanvas(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         context: (map as any).painter.context.gl,
         antialias: true,
       });
@@ -687,7 +687,9 @@ const MapBackground = () => {
           const m = new THREE.Matrix4().fromArray(matrix);
 
           scene.traverse((obj) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((obj as any).transform) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const t = (obj as any).transform;
 
               const rotationX = new THREE.Matrix4().makeRotationAxis(
