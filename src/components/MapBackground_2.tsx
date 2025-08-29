@@ -5,14 +5,12 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-
 import arButtonImg from "../assets/ar.jpeg";
 import locButtonImg from "../assets/loc.jpeg";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
-// --- TypeScript global declaration ---
 declare global {
   interface Window {
     Unity?: { call: (msg: string) => void };
@@ -34,32 +32,20 @@ const MapBackground2: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const routePointMarkersRef = useRef<mapboxgl.Marker[]>([]);
+  const markersRef = useRef<Record<string, { obj: THREE.Object3D; layerId: string }>>({});
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
+const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
-  // ✅ Track 3D marker objects
-  const markersRef = useRef<
-    Record<string, { obj: THREE.Object3D; layerId: string }>
-  >({});
-
-  // --- 3D Models Config ---
   const modelConfigs = {
-    Dollar_Box_Open: {
-      url: "/models/Dollar_Box_Open.glb",
-      scaleMultiplier: 30,
-      rotate: [Math.PI / 2, Math.PI, 0],
-    },
-    Black_XP: {
-      url: "/models/Black_XP.glb",
-      scaleMultiplier: 900,
-      rotate: [Math.PI / 2, Math.PI, 0],
-    },
+    Dollar_Box_Open: { url: "/models/Dollar_Box_Open.glb", scaleMultiplier: 30, rotate: [Math.PI / 2, Math.PI, 0] },
+    Black_XP: { url: "/models/Black_XP.glb", scaleMultiplier: 900, rotate: [Math.PI / 2, Math.PI, 0] },
   };
 
-  // --- SEND TO UNITY ---
   const sendToUnity = (messageObj: any) => {
     try {
       const jsonString = JSON.stringify(messageObj);
       console.log(jsonString);
-
       if (window.Unity && typeof window.Unity.call === "function") {
         window.Unity.call(jsonString);
       } else {
@@ -70,22 +56,17 @@ const MapBackground2: React.FC = () => {
     }
   };
 
-  // --- HANDLE MARKER CLICK ---
   const handleMarkerClick = (markerId: string, coords: [number, number]) => {
     sendToUnity({ type: "markerClick", id: markerId, coords });
   };
 
-  // --- REMOVE MARKER ---
   const removeMarker = (id: string) => {
     if (!mapRef.current) return;
-    const map = mapRef.current;
     const marker = markersRef.current[id];
     if (!marker) return;
 
-    // Dispose 3D object
     marker.obj.traverse((child) => {
-      if ((child as THREE.Mesh).geometry)
-        (child as THREE.Mesh).geometry.dispose();
+      if ((child as THREE.Mesh).geometry) (child as THREE.Mesh).geometry.dispose();
       if ((child as THREE.Mesh).material) {
         const mat = (child as THREE.Mesh).material;
         if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
@@ -95,24 +76,18 @@ const MapBackground2: React.FC = () => {
 
     marker.obj.removeFromParent();
 
-    // Remove Mapbox layer
-    if (map.getLayer(marker.layerId)) map.removeLayer(marker.layerId);
+    if (mapRef.current.getLayer(marker.layerId)) mapRef.current.removeLayer(marker.layerId);
 
     delete markersRef.current[id];
   };
 
-  // --- CLEAR ALL MARKERS ---
-  const clearAllMarkers = () => {
-    Object.keys(markersRef.current).forEach((id) => removeMarker(id));
-  };
+  const clearAllMarkers = () => Object.keys(markersRef.current).forEach(removeMarker);
 
-  // --- HIGHLIGHT MARKER ---
   const highlightMarker = (id: string) => {
     const marker = markersRef.current[id];
     if (marker) marker.obj.scale.multiplyScalar(1.2);
   };
 
-  // --- ADD ROUTE ---
   const addRoute = (points: RoutePoint[]) => {
     if (!mapRef.current || points.length < 2) return;
     const map = mapRef.current;
@@ -132,18 +107,13 @@ const MapBackground2: React.FC = () => {
 
     const routeGeoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
       type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: points.map((p) => p.coords),
-      },
+      geometry: { type: "LineString", coordinates: points.map((p) => p.coords) },
       properties: {},
     };
 
     map.addSource("route", { type: "geojson", data: routeGeoJSON });
 
-    const buildingLayer = map
-      .getStyle()
-      .layers?.find((l) => l.type === "fill-extrusion")?.id;
+    const buildingLayer = map.getStyle().layers?.find((l) => l.type === "fill-extrusion")?.id;
 
     map.addLayer(
       {
@@ -164,34 +134,31 @@ const MapBackground2: React.FC = () => {
       el.style.borderRadius = "50%";
       el.style.border = "2px solid white";
       el.style.pointerEvents = "none";
-
       const marker = new mapboxgl.Marker(el).setLngLat(p.coords).addTo(map);
       routePointMarkersRef.current.push(marker);
     });
   };
+
 const add3DMarkers = (markers: MarkerData[]) => {
   if (!mapRef.current) return;
   const map = mapRef.current;
 
   const types = ["Dollar_Box_Open", "Black_XP"] as const;
 
-  // Keep track of clickable boxes and mapping to marker IDs
-  const clickableObjects: THREE.Object3D[] = [];
-  const objectToMarkerId = new Map<THREE.Object3D, string>();
-  const sceneMap = new Map<string, { scene: THREE.Scene; camera: THREE.Camera }>();
-
   markers.forEach((m) => {
     const type = m.type ?? types[Math.floor(Math.random() * types.length)];
     const merc = mapboxgl.MercatorCoordinate.fromLngLat(m.coords, 120);
     const cfg = modelConfigs[type];
 
+    // Scene and camera
     const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const camera = new THREE.PerspectiveCamera();
 
-    // Add lights
+    // Lighting
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
     light1.position.set(0, -70, 100).normalize();
     scene.add(light1);
+
     const light2 = new THREE.DirectionalLight(0xffffff, 1);
     light2.position.set(0, 70, 100).normalize();
     scene.add(light2);
@@ -209,10 +176,12 @@ const add3DMarkers = (markers: MarkerData[]) => {
             const mat = mesh.material;
             if (Array.isArray(mat)) mat.forEach((m) => (m.side = THREE.DoubleSide));
             else mat.side = THREE.DoubleSide;
+
             mesh.geometry.computeVertexNormals();
           }
         });
 
+        // Transform object to Mapbox Mercator space
         obj.userData.transform = {
           translateX: merc.x,
           translateY: merc.y,
@@ -223,30 +192,34 @@ const add3DMarkers = (markers: MarkerData[]) => {
           scale: merc.meterInMercatorCoordinateUnits() * cfg.scaleMultiplier,
         };
 
-        scene.add(obj);
-
-        // Add a transparent box for clicks
-        const box = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.scaleMultiplier * 2, cfg.scaleMultiplier * 2, cfg.scaleMultiplier * 2),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })
-        );
-
-        box.position.set(merc.x, merc.y, merc.z);
-        scene.add(box);
-
-        clickableObjects.push(box);
-        objectToMarkerId.set(box, m.id);
+        // Use a group wrapper
+        const objGroup = new THREE.Group();
+        objGroup.add(obj);
+        scene.add(objGroup);
 
         // Save reference
         const layerId = `3d-marker-${m.id}`;
-        markersRef.current[m.id] = { obj, layerId };
+        markersRef.current[m.id] = { obj: objGroup, layerId };
 
-        sceneMap.set(m.id, { scene, camera });
+        // ✅ Clickable HTML overlay
+        const el = document.createElement("div");
+        el.style.width = `${cfg.scaleMultiplier * 2}px`;
+        el.style.height = `${cfg.scaleMultiplier * 2}px`;
+        el.style.background = "transparent";
+        el.style.cursor = "pointer";
+        el.style.pointerEvents = "auto";
+
+        new mapboxgl.Marker({ element: el, anchor: "center" })
+          .setLngLat(m.coords)
+          .addTo(map);
+
+        el.addEventListener("click", () => handleMarkerClick(m.id, m.coords));
       },
       undefined,
       (err) => console.error("Error loading 3D model:", err)
     );
 
+    // Renderer for the scene
     const renderer = new THREE.WebGLRenderer({
       canvas: map.getCanvas(),
       context: (map as any).painter.context.gl,
@@ -254,6 +227,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
     });
     renderer.autoClear = false;
 
+    // Add as Mapbox custom layer
     const layerId = `3d-marker-${m.id}`;
     const layer: mapboxgl.CustomLayerInterface = {
       id: layerId,
@@ -266,6 +240,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
         scene.traverse((obj) => {
           if ((obj as any).userData.transform) {
             const t = (obj as any).userData.transform;
+
             const rotationX = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), t.rotateX);
             const rotationY = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0, 1, 0), t.rotateY);
             const rotationZ = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0, 0, 1), t.rotateZ);
@@ -288,48 +263,20 @@ const add3DMarkers = (markers: MarkerData[]) => {
     };
 
     map.addLayer(layer);
-  });
 
-  // Add map click listener for raycasting
-  map.getCanvas().addEventListener("click", (event) => {
-    if (!mapRef.current) return;
-    const rect = mapRef.current.getCanvas().getBoundingClientRect();
-    const mouse = new THREE.Vector2(
-      ((event.clientX - rect.left) / rect.width) * 2 - 1,
-      -((event.clientY - rect.top) / rect.height) * 2 + 1
-    );
-
-    const raycaster = new THREE.Raycaster();
-
-    for (const { scene, camera } of sceneMap.values()) {
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(clickableObjects, true);
-      if (intersects.length > 0) {
-        const first = intersects[0].object;
-        const id = objectToMarkerId.get(first);
-        if (id) {
-          const marker = markers.find((m) => m.id === id);
-          if (marker) handleMarkerClick(id, marker.coords);
-        }
-      }
-    }
-  });
-
-  // Notify Unity
-  sendToUnity({
-    type: "markersAdded",
-    success: true,
-    count: markers.length,
+    // Notify Unity
+    sendToUnity({
+      type: "markersAdded",
+      success: true,
+      count: markers.length,
+    });
   });
 };
 
-
-  // --- SETUP UNITY BRIDGE ---
   const setupUnityBridge = () => {
     window.handleUnityMessage = (message) => {
       try {
-        const data =
-          typeof message === "string" ? JSON.parse(message) : message;
+        const data = typeof message === "string" ? JSON.parse(message) : message;
 
         switch (data.action) {
           case "add":
@@ -348,10 +295,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
             if (Array.isArray(data.points)) addRoute(data.points);
             break;
           default:
-            console.warn(
-              "[React] Unknown Unity message action:",
-              data.action
-            );
+            console.warn("[React] Unknown Unity message action:", data.action);
         }
       } catch (error) {
         console.error("[React] Error handling Unity message:", error);
@@ -361,7 +305,6 @@ const add3DMarkers = (markers: MarkerData[]) => {
     console.log("[React] Unity bridge setup complete");
   };
 
-  // --- MAP INIT ---
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -386,8 +329,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
     });
 
     map.on("zoom", () => {
-      if (map.getZoom() > 15)
-        map.setConfigProperty("basemap", "show3dObjects", true);
+      if (map.getZoom() > 15) map.setConfigProperty("basemap", "show3dObjects", true);
       else map.setConfigProperty("basemap", "show3dObjects", false);
     });
 
@@ -400,10 +342,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
     map.addControl(geolocateControl, "bottom-right");
 
     const observer = new MutationObserver(() => {
-      const button = document.querySelector(
-        ".mapboxgl-ctrl-geolocate"
-      ) as HTMLElement;
-
+      const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
       if (button) {
         button.style.width = "64px";
         button.style.height = "64px";
@@ -421,8 +360,6 @@ const add3DMarkers = (markers: MarkerData[]) => {
     observer.observe(document.body, { childList: true, subtree: true });
 
     mapRef.current = map;
-
-    // Setup Unity bridge
     setupUnityBridge();
 
     return () => {
@@ -435,7 +372,6 @@ const add3DMarkers = (markers: MarkerData[]) => {
   return (
     <div className="absolute w-full h-full z-0">
       <div ref={mapContainer} className="w-full h-full" />
-      {/* AR Mode Button */}
       <button
         onClick={() => sendToUnity({ type: "activateAR" })}
         style={{
