@@ -2,16 +2,12 @@
 
 import React, { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
 import arButtonImg from "../assets/ar.jpeg";
 import locButtonImg from "../assets/loc.jpeg";
-
-import treasureImg from "../assets/Treasure1.1.png";
-import treasureImg_2 from "../assets/XP2.png";
-import treasureImg_3 from "../assets/XP3.png";
-import treasureImg_4 from "../assets/XP4.png";
-import treasureImg_5 from "../assets/Treasure2.2.png";
-
-import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
@@ -24,23 +20,10 @@ declare global {
   }
 }
 
-// pool of treasure images
-const treasureImages = [
-  treasureImg,
-  treasureImg_2,
-  treasureImg_3,
-  treasureImg_4,
-  treasureImg_5,
-];
-
-const getRandomTreasureImage = () => {
-  const index = Math.floor(Math.random() * treasureImages.length);
-  return treasureImages[index].src;
-};
-
 interface MarkerData {
   id: string;
   coords: [number, number];
+  type?: "Dollar_Box_Open" | "Black_XP";
 }
 
 interface RoutePoint {
@@ -50,82 +33,88 @@ interface RoutePoint {
 const MapBackground2: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<Record<string, mapboxgl.Marker>>({});
   const routePointMarkersRef = useRef<mapboxgl.Marker[]>([]);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  // --- MARKERS ---
-  const addMarkers = (markers: MarkerData[]) => {
-  if (!mapRef.current) {
-    // notify Unity failure
-    window.Unity?.call(
-      JSON.stringify({ type: "markersAdded", success: false, reason: "map not ready" })
-    );
-    return false;
-  }
+  // ✅ Track 3D marker objects
+  const markersRef = useRef<
+    Record<string, { obj: THREE.Object3D; layerId: string }>
+  >({});
 
-  try {
-    markers.forEach(({ id, coords }) => {
-      // remove old marker if it exists
-      if (markersRef.current[id]) {
-        markersRef.current[id].remove();
-        delete markersRef.current[id];
+  // --- 3D Models Config ---
+  const modelConfigs = {
+    Dollar_Box_Open: {
+      url: "/models/Dollar_Box_Open.glb",
+      scaleMultiplier: 30,
+      rotate: [Math.PI / 2, Math.PI, 0],
+    },
+    Black_XP: {
+      url: "/models/Black_XP.glb",
+      scaleMultiplier: 900,
+      rotate: [Math.PI / 2, Math.PI, 0],
+    },
+  };
+
+  // --- SEND TO UNITY ---
+  const sendToUnity = (messageObj: any) => {
+    try {
+      const jsonString = JSON.stringify(messageObj);
+      console.log(jsonString);
+
+      if (window.Unity && typeof window.Unity.call === "function") {
+        window.Unity.call(jsonString);
+      } else {
+        console.warn("[React->Unity] Unity.call not available");
       }
-
-      const imgUrl = getRandomTreasureImage();
-
-      const el = document.createElement("div");
-      el.style.width = isMobile ? "90px" : "125px";
-      el.style.height = isMobile ? "90px" : "125px";
-el.style.backgroundImage = `url(${imgUrl})`; 
-      el.style.backgroundSize = "contain";
-      el.style.backgroundRepeat = "no-repeat";
-      el.style.backgroundPosition = "center";
-      el.style.position = "absolute";
-      el.style.top = "0px";
-      el.style.pointerEvents = "auto";
-      el.style.zIndex = "9999";
-
-      el.addEventListener("click", () => {
-        window.Unity?.call(JSON.stringify({ type: "markerClick", id }));
-      });
-
-      const marker = new mapboxgl.Marker(el, { offset: [0, -50] })
-        .setLngLat(coords)
-        .addTo(mapRef.current!);
-
-      markersRef.current[id] = marker;
-    });
-
-    // ✅ notify Unity of success
-    window.Unity?.call(
-      JSON.stringify({ type: "markersAdded", success: true, count: markers.length })
-    );
-
-    return true;
-  } catch (err) {
-    console.error("Error adding markers:", err);
-
-    // ❌ notify Unity of failure
-    window.Unity?.call(
-      JSON.stringify({ type: "markersAdded", success: false, error: String(err) })
-    );
-
-    return false;
-  }
-};
-
-  const removeMarker = (id: string) => {
-    if (markersRef.current[id]) {
-      markersRef.current[id].remove();
-      delete markersRef.current[id];
+    } catch (error) {
+      console.error("[React->Unity] Error sending message:", error);
     }
   };
 
-  // --- ROUTE WITH POINT MARKERS ---
+  // --- HANDLE MARKER CLICK ---
+  const handleMarkerClick = (markerId: string, coords: [number, number]) => {
+    sendToUnity({ type: "markerClick", id: markerId, coords });
+  };
+
+  // --- REMOVE MARKER ---
+  const removeMarker = (id: string) => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+    const marker = markersRef.current[id];
+    if (!marker) return;
+
+    // Dispose 3D object
+    marker.obj.traverse((child) => {
+      if ((child as THREE.Mesh).geometry)
+        (child as THREE.Mesh).geometry.dispose();
+      if ((child as THREE.Mesh).material) {
+        const mat = (child as THREE.Mesh).material;
+        if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+        else mat.dispose();
+      }
+    });
+
+    marker.obj.removeFromParent();
+
+    // Remove Mapbox layer
+    if (map.getLayer(marker.layerId)) map.removeLayer(marker.layerId);
+
+    delete markersRef.current[id];
+  };
+
+  // --- CLEAR ALL MARKERS ---
+  const clearAllMarkers = () => {
+    Object.keys(markersRef.current).forEach((id) => removeMarker(id));
+  };
+
+  // --- HIGHLIGHT MARKER ---
+  const highlightMarker = (id: string) => {
+    const marker = markersRef.current[id];
+    if (marker) marker.obj.scale.multiplyScalar(1.2);
+  };
+
+  // --- ADD ROUTE ---
   const addRoute = (points: RoutePoint[]) => {
     if (!mapRef.current || points.length < 2) return;
-
     const map = mapRef.current;
 
     if (!map.isStyleLoaded()) {
@@ -143,13 +132,18 @@ el.style.backgroundImage = `url(${imgUrl})`;
 
     const routeGeoJSON: GeoJSON.Feature<GeoJSON.LineString> = {
       type: "Feature",
-      geometry: { type: "LineString", coordinates: points.map((p) => p.coords) },
+      geometry: {
+        type: "LineString",
+        coordinates: points.map((p) => p.coords),
+      },
       properties: {},
     };
 
     map.addSource("route", { type: "geojson", data: routeGeoJSON });
 
-    const buildingLayer = map.getStyle().layers?.find((l) => l.type === "fill-extrusion")?.id;
+    const buildingLayer = map
+      .getStyle()
+      .layers?.find((l) => l.type === "fill-extrusion")?.id;
 
     map.addLayer(
       {
@@ -176,20 +170,185 @@ el.style.backgroundImage = `url(${imgUrl})`;
     });
   };
 
-  // --- HANDLE UNITY MESSAGES ---
-  const handleUnityMessage = (msg: string) => {
-    try {
-      const data = JSON.parse(msg);
-      if (data.action === "add" && Array.isArray(data.markers)) {
-        addMarkers(data.markers);
-      } else if (data.action === "remove" && typeof data.id === "string") {
-        removeMarker(data.id);
-      } else if (data.action === "route" && Array.isArray(data.points)) {
-        addRoute(data.points);
+ // --- ADD 3D MARKERS ---
+const add3DMarkers = (markers: MarkerData[]) => {
+  if (!mapRef.current) return;
+  const map = mapRef.current;
+
+  const types = ["Dollar_Box_Open", "Black_XP"] as const;
+
+  markers.forEach((m) => {
+    const type = m.type ?? types[Math.floor(Math.random() * types.length)];
+    const merc = mapboxgl.MercatorCoordinate.fromLngLat(m.coords, 120);
+    const cfg = modelConfigs[type];
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.Camera();
+
+    const light1 = new THREE.DirectionalLight(0xffffff, 1);
+    light1.position.set(0, -70, 100).normalize();
+    scene.add(light1);
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 1);
+    light2.position.set(0, 70, 100).normalize();
+    scene.add(light2);
+
+    const loader = new GLTFLoader();
+    loader.load(
+      cfg.url,
+      (gltf) => {
+        const obj = gltf.scene;
+
+        obj.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            const mat = mesh.material;
+            if (Array.isArray(mat))
+              mat.forEach((m) => (m.side = THREE.DoubleSide));
+            else mat.side = THREE.DoubleSide;
+
+            mesh.geometry.computeVertexNormals();
+          }
+        });
+
+        obj.userData.transform = {
+          translateX: merc.x,
+          translateY: merc.y,
+          translateZ: merc.z,
+          rotateX: cfg.rotate[0],
+          rotateY: cfg.rotate[1],
+          rotateZ: cfg.rotate[2],
+          scale: merc.meterInMercatorCoordinateUnits() * cfg.scaleMultiplier,
+        };
+
+        scene.add(obj);
+
+        // Save reference
+        const layerId = `3d-marker-${m.id}`;
+        markersRef.current[m.id] = { obj, layerId };
+
+        // ✅ Invisible clickable marker overlay
+        const el = document.createElement("div");
+        el.style.width = `${cfg.scaleMultiplier * 2}px`;
+        el.style.height = `${cfg.scaleMultiplier * 2}px`;
+        el.style.background = "transparent";
+        el.style.cursor = "pointer";
+
+        const clickMarker = new mapboxgl.Marker({
+          element: el,
+          anchor: "center",
+        })
+          .setLngLat(m.coords)
+          .addTo(map);
+
+        // Closure keeps correct id + coords
+        el.addEventListener("click", () => {
+          console.log("Clicked marker:", m.id, m.coords);
+          handleMarkerClick(m.id, m.coords);
+        });
+      },
+      undefined,
+      (err) => console.error("Error loading 3D model:", err)
+    );
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: map.getCanvas(),
+      context: (map as any).painter.context.gl,
+      antialias: true,
+    });
+    renderer.autoClear = false;
+
+    const layerId = `3d-marker-${m.id}`;
+
+    const layer: mapboxgl.CustomLayerInterface = {
+      id: layerId,
+      type: "custom",
+      renderingMode: "3d",
+      onAdd: () => {},
+      render: (_gl, matrix) => {
+        const mtx = new THREE.Matrix4().fromArray(matrix);
+
+        scene.traverse((obj) => {
+          if ((obj as any).userData.transform) {
+            const t = (obj as any).userData.transform;
+
+            const rotationX = new THREE.Matrix4().makeRotationAxis(
+              new THREE.Vector3(1, 0, 0),
+              t.rotateX
+            );
+            const rotationY = new THREE.Matrix4().makeRotationAxis(
+              new THREE.Vector3(0, 1, 0),
+              t.rotateY
+            );
+            const rotationZ = new THREE.Matrix4().makeRotationAxis(
+              new THREE.Vector3(0, 0, 1),
+              t.rotateZ
+            );
+
+            const l = new THREE.Matrix4()
+              .makeTranslation(t.translateX, t.translateY, t.translateZ)
+              .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
+              .multiply(rotationX)
+              .multiply(rotationY)
+              .multiply(rotationZ);
+
+            camera.projectionMatrix = mtx.clone().multiply(l);
+          }
+        });
+
+        renderer.resetState();
+        renderer.render(scene, camera);
+        map.triggerRepaint();
+      },
+    };
+
+    map.addLayer(layer);
+  });
+
+  // ✅ Send once, after all markers are added
+  sendToUnity({
+    type: "markersAdded",
+    success: true,
+    count: markers.length,
+  });
+};
+
+
+  // --- SETUP UNITY BRIDGE ---
+  const setupUnityBridge = () => {
+    window.handleUnityMessage = (message) => {
+      try {
+        const data =
+          typeof message === "string" ? JSON.parse(message) : message;
+
+        switch (data.action) {
+          case "add":
+            if (Array.isArray(data.markers)) add3DMarkers(data.markers);
+            break;
+          case "remove":
+            if (data.id) removeMarker(data.id);
+            break;
+          case "clear":
+            clearAllMarkers();
+            break;
+          case "highlight":
+            if (data.id) highlightMarker(data.id);
+            break;
+          case "route":
+            if (Array.isArray(data.points)) addRoute(data.points);
+            break;
+          default:
+            console.warn(
+              "[React] Unknown Unity message action:",
+              data.action
+            );
+        }
+      } catch (error) {
+        console.error("[React] Error handling Unity message:", error);
       }
-    } catch (e) {
-      console.error("Invalid Unity message", e);
-    }
+    };
+
+    console.log("[React] Unity bridge setup complete");
   };
 
   // --- MAP INIT ---
@@ -216,26 +375,25 @@ el.style.backgroundImage = `url(${imgUrl})`;
       map.setConfigProperty("basemap", "show3dObjects", false);
     });
 
-    // Show 3D objects when zoomed in
     map.on("zoom", () => {
-      if (map.getZoom() > 15) {
+      if (map.getZoom() > 15)
         map.setConfigProperty("basemap", "show3dObjects", true);
-      } else {
-        map.setConfigProperty("basemap", "show3dObjects", false);
-      }
+      else map.setConfigProperty("basemap", "show3dObjects", false);
     });
 
-    // --- Geolocate Control ---
     const geolocateControl = new mapboxgl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true },
       trackUserLocation: true,
       showUserHeading: true,
     });
+
     map.addControl(geolocateControl, "bottom-right");
 
-    // MutationObserver to style the Geolocate button
     const observer = new MutationObserver(() => {
-      const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
+      const button = document.querySelector(
+        ".mapboxgl-ctrl-geolocate"
+      ) as HTMLElement;
+
       if (button) {
         button.style.width = "64px";
         button.style.height = "64px";
@@ -249,15 +407,17 @@ el.style.backgroundImage = `url(${imgUrl})`;
         observer.disconnect();
       }
     });
+
     observer.observe(document.body, { childList: true, subtree: true });
 
     mapRef.current = map;
-    window.handleUnityMessage = handleUnityMessage;
+
+    // Setup Unity bridge
+    setupUnityBridge();
 
     return () => {
       map.remove();
       mapRef.current = null;
-      markersRef.current = {};
       routePointMarkersRef.current = [];
     };
   }, []);
@@ -265,10 +425,9 @@ el.style.backgroundImage = `url(${imgUrl})`;
   return (
     <div className="absolute w-full h-full z-0">
       <div ref={mapContainer} className="w-full h-full" />
-
       {/* AR Mode Button */}
       <button
-        onClick={() => window.Unity?.call(JSON.stringify({ type: "activateAR" }))}
+        onClick={() => sendToUnity({ type: "activateAR" })}
         style={{
           backgroundImage: `url(${arButtonImg.src})`,
           backgroundSize: "cover",
