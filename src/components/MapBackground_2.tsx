@@ -169,13 +169,16 @@ const MapBackground2: React.FC = () => {
       routePointMarkersRef.current.push(marker);
     });
   };
-
- // --- ADD 3D MARKERS ---
 const add3DMarkers = (markers: MarkerData[]) => {
   if (!mapRef.current) return;
   const map = mapRef.current;
 
   const types = ["Dollar_Box_Open", "Black_XP"] as const;
+
+  // Keep track of clickable boxes and mapping to marker IDs
+  const clickableObjects: THREE.Object3D[] = [];
+  const objectToMarkerId = new Map<THREE.Object3D, string>();
+  const sceneMap = new Map<string, { scene: THREE.Scene; camera: THREE.Camera }>();
 
   markers.forEach((m) => {
     const type = m.type ?? types[Math.floor(Math.random() * types.length)];
@@ -185,14 +188,15 @@ const add3DMarkers = (markers: MarkerData[]) => {
     const scene = new THREE.Scene();
     const camera = new THREE.Camera();
 
+    // Add lights
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
     light1.position.set(0, -70, 100).normalize();
     scene.add(light1);
-
     const light2 = new THREE.DirectionalLight(0xffffff, 1);
     light2.position.set(0, 70, 100).normalize();
     scene.add(light2);
 
+    // Load 3D model
     const loader = new GLTFLoader();
     loader.load(
       cfg.url,
@@ -203,10 +207,8 @@ const add3DMarkers = (markers: MarkerData[]) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
             const mat = mesh.material;
-            if (Array.isArray(mat))
-              mat.forEach((m) => (m.side = THREE.DoubleSide));
+            if (Array.isArray(mat)) mat.forEach((m) => (m.side = THREE.DoubleSide));
             else mat.side = THREE.DoubleSide;
-
             mesh.geometry.computeVertexNormals();
           }
         });
@@ -223,29 +225,23 @@ const add3DMarkers = (markers: MarkerData[]) => {
 
         scene.add(obj);
 
+        // Add a transparent box for clicks
+        const box = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.scaleMultiplier * 2, cfg.scaleMultiplier * 2, cfg.scaleMultiplier * 2),
+          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })
+        );
+
+        box.position.set(merc.x, merc.y, merc.z);
+        scene.add(box);
+
+        clickableObjects.push(box);
+        objectToMarkerId.set(box, m.id);
+
         // Save reference
         const layerId = `3d-marker-${m.id}`;
         markersRef.current[m.id] = { obj, layerId };
 
-        // ✅ Invisible clickable marker overlay
-        const el = document.createElement("div");
-        el.style.width = `${cfg.scaleMultiplier * 2}px`;
-        el.style.height = `${cfg.scaleMultiplier * 2}px`;
-        el.style.background = "transparent";
-        el.style.cursor = "pointer";
-
-        const clickMarker = new mapboxgl.Marker({
-          element: el,
-          anchor: "center",
-        })
-          .setLngLat(m.coords)
-          .addTo(map);
-
-        // Closure keeps correct id + coords
-        el.addEventListener("click", () => {
-          console.log("Clicked marker:", m.id, m.coords);
-          handleMarkerClick(m.id, m.coords);
-        });
+        sceneMap.set(m.id, { scene, camera });
       },
       undefined,
       (err) => console.error("Error loading 3D model:", err)
@@ -259,7 +255,6 @@ const add3DMarkers = (markers: MarkerData[]) => {
     renderer.autoClear = false;
 
     const layerId = `3d-marker-${m.id}`;
-
     const layer: mapboxgl.CustomLayerInterface = {
       id: layerId,
       type: "custom",
@@ -271,19 +266,9 @@ const add3DMarkers = (markers: MarkerData[]) => {
         scene.traverse((obj) => {
           if ((obj as any).userData.transform) {
             const t = (obj as any).userData.transform;
-
-            const rotationX = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(1, 0, 0),
-              t.rotateX
-            );
-            const rotationY = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(0, 1, 0),
-              t.rotateY
-            );
-            const rotationZ = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(0, 0, 1),
-              t.rotateZ
-            );
+            const rotationX = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), t.rotateX);
+            const rotationY = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0, 1, 0), t.rotateY);
+            const rotationZ = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0, 0, 1), t.rotateZ);
 
             const l = new THREE.Matrix4()
               .makeTranslation(t.translateX, t.translateY, t.translateZ)
@@ -305,7 +290,32 @@ const add3DMarkers = (markers: MarkerData[]) => {
     map.addLayer(layer);
   });
 
-  // ✅ Send once, after all markers are added
+  // Add map click listener for raycasting
+  map.getCanvas().addEventListener("click", (event) => {
+    if (!mapRef.current) return;
+    const rect = mapRef.current.getCanvas().getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+
+    const raycaster = new THREE.Raycaster();
+
+    for (const { scene, camera } of sceneMap.values()) {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(clickableObjects, true);
+      if (intersects.length > 0) {
+        const first = intersects[0].object;
+        const id = objectToMarkerId.get(first);
+        if (id) {
+          const marker = markers.find((m) => m.id === id);
+          if (marker) handleMarkerClick(id, marker.coords);
+        }
+      }
+    }
+  });
+
+  // Notify Unity
   sendToUnity({
     type: "markersAdded",
     success: true,
