@@ -32,10 +32,9 @@ const MapBackground2: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const routePointMarkersRef = useRef<mapboxgl.Marker[]>([]);
-  const markersRef = useRef<Record<string, { obj: THREE.Object3D; layerId: string }>>({});
-  const raycaster = useRef(new THREE.Raycaster());
-  const mouse = useRef(new THREE.Vector2());
-const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+const markersRef = useRef<
+  Record<string, { obj: THREE.Object3D; layerId: string; el: HTMLDivElement }>
+>({});
 
   const modelConfigs = {
     Dollar_Box_Open: { url: "/models/Dollar_Box_Open.glb", scaleMultiplier: 30, rotate: [Math.PI / 2, Math.PI, 0] },
@@ -60,26 +59,36 @@ const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     sendToUnity({ type: "markerClick", id: markerId, coords });
   };
 
-  const removeMarker = (id: string) => {
-    if (!mapRef.current) return;
-    const marker = markersRef.current[id];
-    if (!marker) return;
+ const removeMarker = (id: string) => {
+  if (!mapRef.current) return;
+  const marker = markersRef.current[id];
+  if (!marker) return;
 
-    marker.obj.traverse((child) => {
-      if ((child as THREE.Mesh).geometry) (child as THREE.Mesh).geometry.dispose();
-      if ((child as THREE.Mesh).material) {
-        const mat = (child as THREE.Mesh).material;
-        if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
-        else mat.dispose();
-      }
-    });
+  marker.obj.traverse((child) => {
+    if ((child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+    if ((child as THREE.Mesh).material) {
+      const mat = (child as THREE.Mesh).material;
+      if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+      else mat.dispose();
+    }
+  });
 
-    marker.obj.removeFromParent();
+  marker.obj.removeFromParent();
 
-    if (mapRef.current.getLayer(marker.layerId)) mapRef.current.removeLayer(marker.layerId);
+  if (mapRef.current.getLayer(marker.layerId)) {
+    mapRef.current.removeLayer(marker.layerId);
+  }
 
-    delete markersRef.current[id];
-  };
+  // ✅ remove the hidden HTML overlay
+  if (marker.el && marker.el.parentNode) {
+    marker.el.parentNode.removeChild(marker.el);
+  }
+
+  delete markersRef.current[id];
+};
+
 
   const clearAllMarkers = () => Object.keys(markersRef.current).forEach(removeMarker);
 
@@ -199,22 +208,45 @@ const add3DMarkers = (markers: MarkerData[]) => {
 
         // Save reference
         const layerId = `3d-marker-${m.id}`;
-        markersRef.current[m.id] = { obj: objGroup, layerId };
+        // ✅ Clickable HTML overlay (fixed size hitbox)
+const el = document.createElement("div");
 
-        // ✅ Clickable HTML overlay
-        const el = document.createElement("div");
-        el.style.width = `${cfg.scaleMultiplier * 2}px`;
-        el.style.height = `${cfg.scaleMultiplier * 2}px`;
-        el.style.background = "transparent";
-        el.style.cursor = "pointer";
-        el.style.pointerEvents = "auto";
+// Keep hitbox constant instead of scaling with multiplier
+const HITBOX_SIZE = 100; // px
+el.style.width = `${HITBOX_SIZE}px`;
+el.style.height = `${HITBOX_SIZE}px`;
+el.style.borderRadius = "50%";
+el.style.background = "transparent";
+el.style.cursor = "pointer";
+el.style.pointerEvents = "auto";
+el.style.position = "absolute";
+// el.style.backgroundColor ="black";
 
-        new mapboxgl.Marker({ element: el, anchor: "center" })
-          .setLngLat(m.coords)
-          .addTo(map);
+// Center the clickable div over the marker base
+// el.style.transform = "translate(-50%, -100%)";
 
-        el.addEventListener("click", () => handleMarkerClick(m.id, m.coords));
-      },
+// Attach marker data for retrieval later
+el.dataset.id = m.id;
+el.dataset.coords = JSON.stringify(m.coords);
+
+// Save reference
+markersRef.current[m.id] = { obj: objGroup, layerId, el };
+
+// Use anchor bottom so div aligns with 3D marker's base
+new mapboxgl.Marker({ element: el, anchor: "bottom" })
+  .setLngLat(m.coords)
+  .addTo(map);
+
+console.log("Marker overlay:", m.id, m.coords);
+
+el.addEventListener("click", (e) => {
+  const target = e.currentTarget as HTMLDivElement;
+
+  const id = target.dataset.id;
+  const coords = target.dataset.coords ? JSON.parse(target.dataset.coords) : null;
+if (!id) return;
+  handleMarkerClick(id, coords);
+});      },
       undefined,
       (err) => console.error("Error loading 3D model:", err)
     );
