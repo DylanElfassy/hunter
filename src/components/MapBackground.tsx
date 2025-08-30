@@ -387,7 +387,7 @@ const MapBackground = () => {
     // -----------------------------
     // Model configurations
     // -----------------------------
-    type ModelType = "Dollar_Box_Open" | "Black_XP";
+    type ModelType = "Dollar_Box_Open" | "Black_XP" ;
 
     const modelConfigs: {
       [key in ModelType]: { url: string; scaleMultiplier: number; rotate: [number, number, number] };
@@ -402,14 +402,14 @@ const MapBackground = () => {
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0], // rotate as needed
       },
+    
     };
 
     // -----------------------------
     // Build models array with random type
     // -----------------------------
     const models = treasureCoords.map((coords, idx) => {
-      const type: ModelType = Math.random() < 0.5 ? "Dollar_Box_Open" : "Black_XP";
-      const cfg = modelConfigs[type];
+      const type: ModelType = Math.random() < 0.5 ? "Dollar_Box_Open" : "Black_XP";const cfg = modelConfigs[type];
       return {
         id: `3d-model-${idx}`,
         origin: coords,

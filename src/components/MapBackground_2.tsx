@@ -209,34 +209,44 @@ const add3DMarkers = (markers: MarkerData[]) => {
         // Save reference
         const layerId = `3d-marker-${m.id}`;
         // ✅ Clickable HTML overlay (fixed size hitbox)
-const el = document.createElement("div");
+// Base size
+const BASE_HITBOX_SIZE = 100; // px at zoom 15
+const REFERENCE_ZOOM = 15;
 
-// Keep hitbox constant instead of scaling with multiplier
-const HITBOX_SIZE = 100; // px
-el.style.width = `${HITBOX_SIZE}px`;
-el.style.height = `${HITBOX_SIZE}px`;
+// Create element
+const el = document.createElement("div");
 el.style.borderRadius = "50%";
-el.style.background = "transparent";
 el.style.cursor = "pointer";
 el.style.pointerEvents = "auto";
 el.style.position = "absolute";
-// el.style.backgroundColor ="black";
+// el.style.backgroundColor = "rgba(0,0,0,0.4)"; // with opacity
 
-// Center the clickable div over the marker base
-// el.style.transform = "translate(-50%, -100%)";
+// Helper to resize hitbox based on zoom
+function updateHitboxSize(zoom: number) {
+  // Scale with zoom (you can tweak the formula)
+  const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
+  const size = Math.max(20, BASE_HITBOX_SIZE * scale); // keep at least 20px
+  el.style.width = `${size}px`;
+  el.style.height = `${size}px`;
+  el.style.transform = `translateY(-50%)`; // keep alignment
+}
 
-// Attach marker data for retrieval later
+// Init size
+updateHitboxSize(map.getZoom());
+
+// Listen to zoom changes
+map.on("zoom", () => {
+  updateHitboxSize(map.getZoom());
+});
+
 el.dataset.id = m.id;
 el.dataset.coords = JSON.stringify(m.coords);
 
-// Save reference
 markersRef.current[m.id] = { obj: objGroup, layerId, el };
 
-// Use anchor bottom so div aligns with 3D marker's base
 new mapboxgl.Marker({ element: el, anchor: "bottom" })
   .setLngLat(m.coords)
   .addTo(map);
-
 console.log("Marker overlay:", m.id, m.coords);
 
 el.addEventListener("click", (e) => {
