@@ -41,20 +41,42 @@ const markersRef = useRef<
     Black_XP: { url: "/models/Black_XP.glb", scaleMultiplier: 900, rotate: [Math.PI / 2, Math.PI, 0] },
   };
 
-  const sendToUnity = (messageObj: any) => {
-    try {
-      const jsonString = JSON.stringify(messageObj);
-      console.log(jsonString);
-      if (window.Unity && typeof window.Unity.call === "function") {
-        window.Unity.call(jsonString);
-      } else {
-        console.warn("[React->Unity] Unity.call not available");
-      }
-    } catch (error) {
-      console.error("[React->Unity] Error sending message:", error);
-    }
-  };
+  // const sendToUnity = (messageObj: any) => {
+  //   try {
+  //     const jsonString = JSON.stringify(messageObj);
+  //     console.log(jsonString);
+  //     if (window.Unity && typeof window.Unity.call === "function") {
+  //       window.Unity.call(jsonString);
+  //     } else {
+  //       console.warn("[React->Unity] Unity.call not available");
+  //     }
+  //   } catch (error) {
+  //     console.error("[React->Unity] Error sending message:", error);
+  //   }
+  // };
 
+  	const sendToUnity = (messageObj: any) => {
+		try {
+			const jsonString = JSON.stringify(messageObj);
+			console.log("[React->Unity] Sending:", jsonString);
+			
+			// Use vuplex.postMessage (what Unity is actually listening for!)
+			if (window.vuplex && typeof window.vuplex.postMessage === "function") {
+				window.vuplex.postMessage(jsonString);
+				console.log("[React->Unity] Sent via vuplex.postMessage");
+			} 
+			// Fallback to Unity.call if needed
+			else if (window.Unity && typeof window.Unity.call === "function") {
+				window.Unity.call(jsonString);
+				console.log("[React->Unity] Sent via Unity.call (fallback)");
+			} else {
+				console.error("[React->Unity] No messaging method available!");
+			}
+		} catch (error) {
+			console.error("[React->Unity] Error sending message:", error);
+		}
+	};
+  
   const handleMarkerClick = (markerId: string, coords: [number, number]) => {
     sendToUnity({ type: "markerClick", id: markerId, coords });
   };
