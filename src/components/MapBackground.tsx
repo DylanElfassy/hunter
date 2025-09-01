@@ -387,29 +387,38 @@ const MapBackground = () => {
     // -----------------------------
     // Model configurations
     // -----------------------------
-    type ModelType = "Dollar_Box_Open" | "Black_XP" ;
+   type ModelType = "Dollar_Box_Open" | "Black_XP" | "Black_XP_2";
 
-    const modelConfigs: {
-      [key in ModelType]: { url: string; scaleMultiplier: number; rotate: [number, number, number] };
-    } = {
-      Dollar_Box_Open: {
-        url: "/models/Dollar_Box_Open.glb",
-        scaleMultiplier: 30,
-        rotate: [Math.PI / 2, Math.PI, 0],
-      },
-      Black_XP: {
-        url: "/models/Black_XP.glb",
-        scaleMultiplier: 900,
-        rotate: [Math.PI / 2, Math.PI, 0], // rotate as needed
-      },
-    
-    };
+const modelConfigs: {
+  [key in ModelType]: { url: string; scaleMultiplier: number; rotate: [number, number, number] };
+} = {
+  Dollar_Box_Open: {
+    url: "/models/Dollar_Box_Open.glb",
+    scaleMultiplier: 30,
+    rotate: [Math.PI / 2, Math.PI, 0],
+  },
+  Black_XP: {
+    url: "/models/Black_XP_3.glb",
+    scaleMultiplier: 900,
+    rotate: [Math.PI / 2, Math.PI, 0],
+  },
+  Black_XP_2: {
+    url: "/models/Black_XP.glb", // add your model file here
+    scaleMultiplier: 900,           // adjust scale as needed
+    rotate: [Math.PI / 2, Math.PI, 0], // adjust rotation if needed
+  },
+};
+
 
     // -----------------------------
     // Build models array with random type
     // -----------------------------
     const models = treasureCoords.map((coords, idx) => {
-      const type: ModelType = Math.random() < 0.5 ? "Dollar_Box_Open" : "Black_XP";const cfg = modelConfigs[type];
+const types: ModelType[] = ["Dollar_Box_Open", "Black_XP", "Black_XP_2"];
+const type: ModelType = types[Math.floor(Math.random() * types.length)];    
+console.log("Randomly selected type:", type);
+
+const cfg = modelConfigs[type];
       return {
         id: `3d-model-${idx}`,
         origin: coords,

@@ -3,7 +3,9 @@ import referralImage from '../assets/sign20.png'; // replace with actual image
 
 export const ReferralSection = () => {
   return (
-<section className="py-12 md:py-20 px-4 md:px-20 bg-white">
+<section 
+id="referral"
+className="py-12 md:py-20 px-4 md:px-20 bg-white">
   <div className="w-full bg-[#F5F5F5] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between relative overflow-visible">
     
     {/* Left Part with padding-left */}
