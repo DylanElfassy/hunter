@@ -56,6 +56,7 @@ const markersRef = useRef<
   // };
 
   	const sendToUnity = (messageObj: any) => {
+      console.log("In",messageObj);
 		try {
 			const jsonString = JSON.stringify(messageObj);
 			console.log("[React->Unity] Sending:", jsonString);
@@ -389,13 +390,13 @@ if (!id) return;
       map.setConfigProperty("basemap", "showRoadLabels", false);
       map.setConfigProperty("basemap", "showTransitLabels", false);
       map.setConfigProperty("basemap", "lightPreset", "dusk");
-      map.setConfigProperty("basemap", "show3dObjects", false);
+      map.setConfigProperty("basemap", "show3dObjects", true);
     });
 
-    map.on("zoom", () => {
-      if (map.getZoom() > 15) map.setConfigProperty("basemap", "show3dObjects", true);
-      else map.setConfigProperty("basemap", "show3dObjects", false);
-    });
+    // map.on("zoom", () => {
+    //   if (map.getZoom() > 15) map.setConfigProperty("basemap", "show3dObjects", true);
+    //   else map.setConfigProperty("basemap", "show3dObjects", false);
+    // });
 
     const geolocateControl = new mapboxgl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true },
@@ -408,12 +409,14 @@ if (!id) return;
     const observer = new MutationObserver(() => {
       const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
       if (button) {
-        button.style.width = "64px";
-        button.style.height = "64px";
-        button.style.backgroundImage = `url(${locButtonImg.src})`;
-        button.style.backgroundSize = "cover";
-        button.style.backgroundPosition = "center";
-        button.style.borderRadius = "50%";
+          if (window.innerWidth < 640) { // mobile breakpoint
+         button.style.width = "56px";
+        button.style.height = "56px";// mobile
+      } else {
+         button.style.width = "48px";
+        button.style.height = "48px";// desktop
+      }
+       
         button.style.zIndex = "10000";
         button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
         button.style.border = "none";
@@ -423,6 +426,25 @@ if (!id) return;
 
     observer.observe(document.body, { childList: true, subtree: true });
 
+   const observer_1 = new MutationObserver(() => {
+  const controls = document.querySelectorAll(
+    ".mapboxgl-ctrl-bottom-right .mapboxgl-ctrl"
+  ) as NodeListOf<HTMLElement>;
+
+  if (controls.length) {
+    controls.forEach((ctrl) => {
+      // Check screen width
+      if (window.innerWidth < 640) { // mobile breakpoint
+        ctrl.style.margin = "0px 24px 25px 0px"; // mobile
+      } else {
+        ctrl.style.margin = "0px 20px 20px 0px"; // desktop
+      }
+    });
+    observer_1.disconnect();
+  }
+});
+
+observer_1.observe(document.body, { childList: true, subtree: true });
     mapRef.current = map;
     setupUnityBridge();
 
@@ -436,15 +458,24 @@ if (!id) return;
   return (
     <div className="absolute w-full h-full z-0">
       <div ref={mapContainer} className="w-full h-full" />
-      <button
-        onClick={() => sendToUnity({ type: "activateAR" })}
-        style={{
-          backgroundImage: `url(${arButtonImg.src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-        className="absolute bottom-24 right-4 w-16 h-16 rounded-full shadow-lg border-none cursor-pointer hover:scale-110 transition-transform"
-      />
+     <button
+  onClick={() => sendToUnity({ type: "activateAR" })}
+  className="
+    absolute right-4 bottom-40 sm:bottom-32
+    w-18 h-18 sm:w-14 sm:h-14 
+    rounded-full 
+    bg-gradient-to-br from-white to-gray-200 
+    border-2 border-gray-300 
+    shadow-xl 
+    text-black font-bold text-lg sm:text-xl 
+    flex items-center justify-center 
+    cursor-pointer 
+    hover:scale-110 hover:shadow-2xl 
+    transition-transform transition-shadow
+  "
+>
+  AR
+</button>
     </div>
   );
 };
