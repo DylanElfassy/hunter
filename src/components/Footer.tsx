@@ -21,6 +21,8 @@ export const Footer = () => {
           <a href="/terms" className="hover:underline">Terms</a>
           <span>|</span>
           <a href="/privacy" className="hover:underline">Privacy</a>
+          <span>|</span>
+          <a href="/faq" className="hover:underline">FAQ</a>
         </div>
 
         {/* Right: Social Icons */}

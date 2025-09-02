@@ -19,7 +19,7 @@ import friends from "../../assets/Friends.png"; // update path as needed
 import pink from "../../assets/Pink_flash.png"; // update path as needed
 import xp2 from "../../assets/XP2.png"; // update path as needed
 import xp3 from "../../assets/XP4.png"; // update path as needed
-import golden from "../../assets/golden-1.png"; // update path as needed
+import golden from "../../assets/gold.png"; // update path as needed
 
 const StepIntoGameSection: React.FC = () => (
   <section 
