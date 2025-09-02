@@ -33,9 +33,8 @@ export const CTA = () => {
   <h2 className="text-4xl md:text-5xl font-Unbounded font-bold mb-4 uppercase">
     Ready to Hunt?
   </h2>
-  <p className="font-Jakarta text-lg md:text-xl mb-6 max-w-md mx-auto md:mx-0 text-center md:text-left">
-    Download the app, unlock your first mission, <br />
-    and start collecting rewards now.
+  <p className="font-Jakarta text-lg md:text-xl mb-6 mx-auto md:mx-0 text-center md:text-left">
+    Download the app,  join the hunt and win cash now!
   </p>
 
   <div className="flex justify-center md:justify-start gap-4 flex-wrap">

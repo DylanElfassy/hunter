@@ -36,7 +36,7 @@ const Premium = () => {
     </div>
 
     {/* Right Rectangle with black background — full width on md */}
-    <div className="rounded-3xl w-full h-auto bg-black relative p-8 flex flex-col justify-start">
+    <div className="rounded-3xl w-full h-auto bg-black relative p-2 lg:p-8 flex flex-col justify-start">
       {/* <h3
         className="font-Jakarta text-xl font-bold"
         style={{

@@ -20,7 +20,7 @@ const StepCard: React.FC<StepCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative rounded-3xl p-8 h-auto min-h-[400px] md:min-h-[555px] overflow-hidden
+      className={`relative rounded-4xl p-8 h-auto min-h-[400px] md:min-h-[555px] overflow-hidden
         hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group bg-[#f5f5f5] flex flex-col ${className}`}
     >
       <div className={`relative z-10 flex flex-col ${contentClassName}`}>

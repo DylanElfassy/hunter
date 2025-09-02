@@ -204,14 +204,14 @@ body {
 
 @media (min-width: 1280px) {
   .back-image {
-    background-size: contain; /* 1280px and wider */
+    background-size: cover; /* 1280px and wider */
   }
 
     .back-image-2 {
-    background-size: contain; /* 1280px and wider */
+    background-size: cover; /* 1280px and wider */
   }
 
     .back-image-3 {
-    background-size: contain; /* 1280px and wider */
+    background-size: cover; /* 1280px and wider */
   }
 }
