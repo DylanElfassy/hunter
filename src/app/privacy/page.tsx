@@ -161,7 +161,7 @@ Last Updated: August 12, 2025</p>
 </ul>
 
 <p className="mt-2">
-    <strong>No Third-Party Marketing Disclosure:</strong> We do not share your personal information with unaffiliated third parties for their own direct marketing purposes unless you have given us consent to do so. Hunters does not rent or sell customer lists to other companies for marketing. In the event this policy changes, California residents would have the right to request information about such practices under the "Shine the Light" law, as described in Section 5, but as of now we engage in no such sharing.
+    <strong>No Third-Party Marketing Disclosure:</strong> We do not share your personal information with unaffiliated third parties for their own direct marketing purposes unless you have given us consent to do so. Hunters does not rent or sell customer lists to other companies for marketing. In the event this policy changes, California residents would have the right to request information about such practices under the &quot;Shine the Light&quot; law, as described in Section 5, but as of now we engage in no such sharing.
   </p>
 
         </section>
@@ -477,7 +477,7 @@ Approved By: Adam Amsellem, Founder & Managing Member  </p>
 
 <h2 className="text-2xl font-bold mt-6 mb-2">1. Purpose</h2>
 <p>
-  The purpose of this Anti-Money Laundering (AML) Policy is to establish robust procedures for detecting and preventing any attempt to use Tamar Innovations LLC's Hunters platform for money laundering, terrorist financing, or other illicit financial activities. This policy is designed to ensure compliance with applicable U.S. federal laws, including the Bank Secrecy Act (BSA) and the USA PATRIOT Act.
+  The purpose of this Anti-Money Laundering (AML) Policy is to establish robust procedures for detecting and preventing any attempt to use Tamar Innovations LLC&apos;s Hunters platform for money laundering, terrorist financing, or other illicit financial activities. This policy is designed to ensure compliance with applicable U.S. federal laws, including the Bank Secrecy Act (BSA) and the USA PATRIOT Act.
 </p>
 
 <h2 className="text-2xl font-bold mt-6 mb-2">2. Scope</h2>

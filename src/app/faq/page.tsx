@@ -55,7 +55,7 @@ export default function FAQPage() {
               <li>Wire Transfer</li>
             </ul>
             <p>
-              Simply open your wallet, tap 'Withdraw,' select your preferred option, and confirm.
+              Simply open your wallet, tap &apos;Withdraw,&apos; select your preferred option, and confirm.
             </p>
           </div>
 
