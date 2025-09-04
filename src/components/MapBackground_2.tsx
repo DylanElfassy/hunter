@@ -11,17 +11,31 @@ import locButtonImg from "../assets/loc.jpeg";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
+  interface GeolocationPosition {
+  coords: GeolocationCoordinates;
+  timestamp: number;
+}
+
+interface GeolocationCoordinates {
+  latitude: number;
+  longitude: number;
+  altitude: number | null;
+  accuracy: number;
+  altitudeAccuracy: number | null;
+  heading: number | null;
+  speed: number | null;
+}
 // -------------------------
 // GEOLOCATION POLYFILL
 // -------------------------
 (function () {
-  // Ensure geolocation exists
+  // Ensure navigator.geolocation exists
   if (!navigator.geolocation) {
     (navigator as any).geolocation = {} as Geolocation;
   }
 
-  const listeners = new Map<number, Function>();
-  let pendingGets: Function[] = [];
+  const listeners = new Map<number, PositionCallback>();
+  let pendingGets: PositionCallback[] = [];
   let nextId = 1;
 
   // Save original browser geolocation functions
@@ -29,16 +43,30 @@ mapboxgl.accessToken =
   const originalWatchPosition = navigator.geolocation.watchPosition?.bind(navigator.geolocation);
   const originalClearWatch = navigator.geolocation.clearWatch?.bind(navigator.geolocation);
 
+  // Helper to create a GeolocationPosition
+  function makeGeoPosition(lat: number, lon: number, acc: number): GeolocationPosition {
+    return {
+      coords: {
+        latitude: lat,
+        longitude: lon,
+        altitude: null,
+        accuracy: acc,
+        altitudeAccuracy: null,
+        heading: null,
+        speed: null,
+      },
+      timestamp: Date.now(),
+    };
+  }
+
   function sendToUnity(obj: any) {
     try {
-      const json = JSON.stringify(obj);
-
       if (window.vuplex?.postMessage) {
-        window.vuplex.postMessage(json);
+        window.vuplex.postMessage(JSON.stringify(obj));
       } else if (window.Unity?.call) {
-        window.Unity.call(json);
+        window.Unity.call(JSON.stringify(obj));
       } else {
-        // Browser fallback: use native geolocation without recursion
+        // Browser fallback: call original geolocation without recursion
         if (obj.type === "geo:getOnce" && originalGetCurrentPosition) {
           originalGetCurrentPosition(
             (pos) => {
@@ -57,7 +85,7 @@ mapboxgl.accessToken =
             (err) => console.warn("[GeoPolyfill] geolocation watch error:", err),
             obj.options || {}
           );
-          // Optionally store id if you want to allow clearWatch in browser
+          // Optionally store id to allow clearWatch in browser
         }
       }
     } catch (e) {
@@ -65,9 +93,9 @@ mapboxgl.accessToken =
     }
   }
 
-  // Called by Unity or Vuplex with coordinates
+  // Called by Unity/Vuplex with coordinates
   window.__applyUnityGeolocation = function (lat: number, lon: number, acc: number, id?: number) {
-    const pos = { coords: { latitude: lat, longitude: lon, accuracy: acc }, timestamp: Date.now() };
+const pos = makeGeoPosition(lat, lon, acc) as any;
 
     if (id && listeners.has(id)) {
       try { listeners.get(id)?.(pos); } catch (e) { console.error(e); }
@@ -102,16 +130,15 @@ mapboxgl.accessToken =
   console.log("[GeoPolyfill] navigator.geolocation is now bridged to Unity");
 })();
 
-
-
+// -------------------------
+// GLOBAL WINDOW TYPES
+// -------------------------
 declare global {
   interface Window {
     Unity?: { call: (msg: string) => void };
-    handleUnityMessage?: (msg: string) => void;
-        __applyUnityGeolocation?: (lat: number, lon: number, acc: number, id?: number) => void;
+    vuplex?: { postMessage: (msg: any) => void }; // must match existing type
+    __applyUnityGeolocation?: (lat: number, lon: number, acc: number, id?: number) => void;
   }
-
-
 }
 
 interface MarkerData {
