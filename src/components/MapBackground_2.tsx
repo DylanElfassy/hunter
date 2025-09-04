@@ -11,11 +11,107 @@ import locButtonImg from "../assets/loc.jpeg";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg";
 
+// -------------------------
+// GEOLOCATION POLYFILL
+// -------------------------
+(function () {
+  // Ensure geolocation exists
+  if (!navigator.geolocation) {
+    (navigator as any).geolocation = {} as Geolocation;
+  }
+
+  const listeners = new Map<number, Function>();
+  let pendingGets: Function[] = [];
+  let nextId = 1;
+
+  // Save original browser geolocation functions
+  const originalGetCurrentPosition = navigator.geolocation.getCurrentPosition?.bind(navigator.geolocation);
+  const originalWatchPosition = navigator.geolocation.watchPosition?.bind(navigator.geolocation);
+  const originalClearWatch = navigator.geolocation.clearWatch?.bind(navigator.geolocation);
+
+  function sendToUnity(obj: any) {
+    try {
+      const json = JSON.stringify(obj);
+
+      if (window.vuplex?.postMessage) {
+        window.vuplex.postMessage(json);
+      } else if (window.Unity?.call) {
+        window.Unity.call(json);
+      } else {
+        // Browser fallback: use native geolocation without recursion
+        if (obj.type === "geo:getOnce" && originalGetCurrentPosition) {
+          originalGetCurrentPosition(
+            (pos) => {
+              console.log("[GeoPolyfill] Browser geolocation:", pos.coords);
+              window.__applyUnityGeolocation?.(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+            },
+            (err) => console.warn("[GeoPolyfill] geolocation error:", err),
+            obj.options || {}
+          );
+        } else if (obj.type === "geo:startWatch" && originalWatchPosition) {
+          const id = originalWatchPosition(
+            (pos) => {
+              console.log("[GeoPolyfill] Browser watch position:", pos.coords);
+              window.__applyUnityGeolocation?.(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, obj.id);
+            },
+            (err) => console.warn("[GeoPolyfill] geolocation watch error:", err),
+            obj.options || {}
+          );
+          // Optionally store id if you want to allow clearWatch in browser
+        }
+      }
+    } catch (e) {
+      console.error("[GeoPolyfill] send error", e);
+    }
+  }
+
+  // Called by Unity or Vuplex with coordinates
+  window.__applyUnityGeolocation = function (lat: number, lon: number, acc: number, id?: number) {
+    const pos = { coords: { latitude: lat, longitude: lon, accuracy: acc }, timestamp: Date.now() };
+
+    if (id && listeners.has(id)) {
+      try { listeners.get(id)?.(pos); } catch (e) { console.error(e); }
+    } else {
+      const cbs = pendingGets.slice();
+      pendingGets = [];
+      cbs.forEach(cb => { try { cb(pos); } catch (e) { console.error(e); } });
+    }
+  };
+
+  // Override geolocation methods
+  navigator.geolocation.getCurrentPosition = function (success, error, options) {
+    pendingGets.push(success);
+    sendToUnity({ type: "geo:getOnce", options: options || null });
+  };
+
+  navigator.geolocation.watchPosition = function (success, error, options) {
+    const id = nextId++;
+    listeners.set(id, success);
+    sendToUnity({ type: "geo:startWatch", id, options: options || null });
+    return id;
+  };
+
+  navigator.geolocation.clearWatch = function (id: number) {
+    if (listeners.has(id)) {
+      listeners.delete(id);
+      sendToUnity({ type: "geo:stopWatch", id });
+      if (originalClearWatch) originalClearWatch(id);
+    }
+  };
+
+  console.log("[GeoPolyfill] navigator.geolocation is now bridged to Unity");
+})();
+
+
+
 declare global {
   interface Window {
     Unity?: { call: (msg: string) => void };
     handleUnityMessage?: (msg: string) => void;
+        __applyUnityGeolocation?: (lat: number, lon: number, acc: number, id?: number) => void;
   }
+
+
 }
 
 interface MarkerData {
@@ -377,7 +473,7 @@ if (!id) return;
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/standard",
       center: [-73.976, 40.769],
-      zoom: 15,
+      zoom: 16,
       pitch: 75,
       bearing: -110,
       interactive: true,
@@ -392,6 +488,22 @@ if (!id) return;
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
     });
+
+      // --- CENTER MAP ON USER LOCATION ---
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          console.log(pos)
+          map.setCenter([longitude, latitude]);
+        },
+        (err) => {
+          console.warn("Could not get user location:", err);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
 
     // map.on("zoom", () => {
     //   if (map.getZoom() > 15) map.setConfigProperty("basemap", "show3dObjects", true);
