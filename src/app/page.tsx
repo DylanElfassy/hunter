@@ -20,7 +20,7 @@ export default function Home() {
     <main>
       {/* <Hero /> */}
       
-      <HeroMap />
+      {/* <HeroMap /> */}
       <StepIntoGame />
       <Premium />
       <ReferralSection />
