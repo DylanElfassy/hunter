@@ -577,10 +577,10 @@ const cfg = modelConfigs[type];
       startTimeout = setTimeout(animate, 8000);
       setTimeout(() => setLoading(false), 5000);
 
-      models.forEach((m) => {
-        const layer = createCustomLayer(map, m);
-        map.addLayer(layer);
-      });
+      // models.forEach((m) => {
+      //   const layer = createCustomLayer(map, m);
+      //   map.addLayer(layer);
+      // });
     });
 
     return () => {
