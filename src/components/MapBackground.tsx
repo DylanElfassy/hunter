@@ -681,15 +681,15 @@ const cfg = modelConfigs[type];
     // -----------------------------
     // Animate map bearing
     // -----------------------------
-    // let animationFrameId: number;
+    let animationFrameId: number;
     let startTimeout: NodeJS.Timeout;
-    // let bearing = -150;
+    let bearing = -150;
 
-    // const animate = () => {
-    //   bearing += 0.2;
-    //   map.setBearing(bearing % 360);
-    //   animationFrameId = requestAnimationFrame(animate);
-    // };
+    const animate = () => {
+      bearing += 0.2;
+      map.setBearing(bearing % 360);
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
     map.on("style.load", () => {
       map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
@@ -700,7 +700,7 @@ const cfg = modelConfigs[type];
       map.setConfigProperty("basemap", "lightPreset", "dusk");
       map.setConfigProperty("basemap", "show3dObjects", true);
 
-      // startTimeout = setTimeout(animate, 8000);
+      startTimeout = setTimeout(animate, 8000);
       setTimeout(() => setLoading(false), 5000);
 
       // models.forEach((m) => {
@@ -717,8 +717,8 @@ const cfg = modelConfigs[type];
     });
 
     return () => {
-      // cancelAnimationFrame(animationFrameId);
-      // clearTimeout(startTimeout);
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(startTimeout);
       map.remove();
     };
   }, []);
