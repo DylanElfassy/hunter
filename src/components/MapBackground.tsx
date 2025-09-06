@@ -363,8 +363,8 @@ const MapBackground = () => {
     // -----------------------------
     const treasureCoords: [number, number][] = [
       [-73.9690, 40.7644],
-      // [-73.9677, 40.7723],
-      // [-73.9774, 40.7794],
+      [-73.9677, 40.7723],
+      [-73.9774, 40.7794],
       // [-73.9752, 40.7580],
       // [-73.9862, 40.7656],
       // [-73.9818, 40.7740],
@@ -387,7 +387,7 @@ const MapBackground = () => {
     // -----------------------------
     // Model configurations
     // -----------------------------
-   type ModelType = "Dollar_Box_Open" | "Black_XP" | "Black_XP_2" | "Pink_XP" | "Blue_XP" | "cube";
+   type ModelType = "Dollar_Box_Open" | "Black_XP" | "Black_XP_2" | "Pink_XP" | "Blue_XP";
 
 const modelConfigs: {
   [key in ModelType]: { url: string; scaleMultiplier: number; rotate: [number, number, number] };
@@ -417,11 +417,6 @@ const modelConfigs: {
     scaleMultiplier: 900,           // adjust scale as needed
     rotate: [Math.PI / 2, Math.PI, 0], // adjust rotation if needed
   },
-   cube: {
-    url: "", // not needed for cube
-    scaleMultiplier: 1000,   // ✅ make the cube big
-    rotate: [0, 0, 0],       // no rotation
-  },
 };
 
 
@@ -429,9 +424,8 @@ const modelConfigs: {
     // Build models array with random type
     // -----------------------------
     const models = treasureCoords.map((coords, idx) => {
-const types: ModelType[] = ["Dollar_Box_Open", "Black_XP", "Black_XP_2", "Pink_XP", "Blue_XP","cube"];
-// const type: ModelType = types[Math.floor(Math.random() * types.length)];    
-const type: ModelType = types[3];
+const types: ModelType[] = ["Dollar_Box_Open", "Black_XP", "Black_XP_2", "Pink_XP", "Blue_XP"];
+const type: ModelType = types[Math.floor(Math.random() * types.length)];    
 console.log("Randomly selected type:", type);
 
 const cfg = modelConfigs[type];
@@ -558,126 +552,6 @@ const cfg = modelConfigs[type];
       };
     };
 
-// // -----------------------------
-// // Cube configurations
-// // -----------------------------
-// type ModelType = "cube";
-
-// const modelConfigs: {
-//   [key in ModelType]: { scaleMultiplier: number; rotate: [number, number, number] };
-// } = {
-//   cube: {
-//     scaleMultiplier: 100, // ✅ adjust cube size
-//     rotate: [0, 0, 0],     // no rotation
-//   },
-// };
-
-// // -----------------------------
-// // Build models array
-// // -----------------------------
-// const models = treasureCoords.map((coords, idx) => {
-//   const cfg = modelConfigs["cube"];
-//   return {
-//     id: `cube-${idx}`,
-//     origin: coords,
-//     altitude: 120,
-//     scaleMultiplier: cfg.scaleMultiplier,
-//     rotate: cfg.rotate,
-//   };
-// });
-
-// // -----------------------------
-// // Function to create a cube layer
-// // -----------------------------
-// const createCustomLayer = (
-//   map: mapboxgl.Map,
-//   model: typeof models[number]
-// ): mapboxgl.CustomLayerInterface => {
-//   const camera = new THREE.Camera();
-//   const scene = new THREE.Scene();
-
-//   // Lighting
-//   const light1 = new THREE.DirectionalLight(0xffffff, 1);
-//   light1.position.set(0, -70, 100).normalize();
-//   scene.add(light1);
-
-//   const light2 = new THREE.DirectionalLight(0xffffff, 1);
-//   light2.position.set(0, 70, 100).normalize();
-//   scene.add(light2);
-
-//   // Transform
-//   const merc = mapboxgl.MercatorCoordinate.fromLngLat(model.origin, model.altitude);
-//   const transform = {
-//     translateX: merc.x,
-//     translateY: merc.y,
-//     translateZ: merc.z,
-//     rotateX: model.rotate[0],
-//     rotateY: model.rotate[1],
-//     rotateZ: model.rotate[2],
-//     scale: merc.meterInMercatorCoordinateUnits() * model.scaleMultiplier,
-//   };
-
-//   // ✅ Create cube
-//   const geometry = new THREE.BoxGeometry(1, 1, 1);
-//   const material = new THREE.MeshStandardMaterial({ color: 0x0077ff, side: THREE.DoubleSide });
-//   const cube = new THREE.Mesh(geometry, material);
-//   (cube as any).transform = transform;
-//   scene.add(cube);
-
-//   const renderer = new THREE.WebGLRenderer({
-//     canvas: map.getCanvas(),
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     context: (map as any).painter.context.gl,
-//     antialias: true,
-//   });
-//   renderer.autoClear = false;
-
-//   return {
-//     id: model.id,
-//     type: "custom",
-//     renderingMode: "3d",
-//     onAdd: () => {},
-//     render: (_gl, matrix) => {
-//       const m = new THREE.Matrix4().fromArray(matrix);
-
-//       scene.traverse((obj) => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         if ((obj as any).transform) {
-//           const t = (obj as any).transform;
-
-//           const rotationX = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(1, 0, 0),
-//             t.rotateX
-//           );
-//           const rotationY = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(0, 1, 0),
-//             t.rotateY
-//           );
-//           const rotationZ = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(0, 0, 1),
-//             t.rotateZ
-//           );
-
-//           const l = new THREE.Matrix4()
-//             .makeTranslation(t.translateX, t.translateY, t.translateZ)
-//             .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
-//             .multiply(rotationX)
-//             .multiply(rotationY)
-//             .multiply(rotationZ);
-
-//           camera.projectionMatrix = m.clone().multiply(l);
-//         }
-//       });
-
-//       renderer.resetState();
-//       renderer.render(scene, camera);
-//       map.triggerRepaint();
-//     },
-//   };
-// };
-
-
-
     // -----------------------------
     // Animate map bearing
     // -----------------------------
@@ -703,17 +577,10 @@ const cfg = modelConfigs[type];
       startTimeout = setTimeout(animate, 8000);
       setTimeout(() => setLoading(false), 5000);
 
-      // models.forEach((m) => {
-      //   const layer = createCustomLayer(map, m);
-      //   // map.addLayer(layer);
-      //     map.addLayer(createCustomLayer(map, model));
-
-
-      // });
-      
-      models.forEach(function(model) {
-  map.addLayer(createCustomLayer(map, model));
-});
+      models.forEach((m) => {
+        const layer = createCustomLayer(map, m);
+        map.addLayer(layer);
+      });
     });
 
     return () => {
