@@ -708,7 +708,7 @@ const MapBackground = () => {
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
-        url: "/models/XP_Blue_V2.glb",
+        url: "/models/XP_Blue_V2-opt.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
