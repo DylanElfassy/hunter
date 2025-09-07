@@ -663,7 +663,7 @@ const MapBackground = () => {
       [-73.9774, 40.7794],
       [-73.9752, 40.7580],
       [-73.9862, 40.7656],
-      [-73.9818, 40.7740],
+      // [-73.9818, 40.7740],
       // [-73.9785, 40.7639],
       // [-73.9649, 40.7676],
       // [-73.9442, 40.6782],
@@ -693,12 +693,12 @@ const MapBackground = () => {
       };
     } = {
       Dollar_Box_Open: {
-        url: "/models/box1.glb",
+        url: "/models/box1-opt.glb",
         scaleMultiplier: 1,
         rotate: [0, 0, 0],
       },
       Black_XP_2: {
-        url: "/models/Black_XP_3.glb",
+        url: "/models/Black_XP_3-opt.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
@@ -708,7 +708,7 @@ const MapBackground = () => {
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
-        url: "/models/XP_Blue_V2.glb",
+        url: "/models/XP_Blue_V2-opt.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
@@ -724,8 +724,8 @@ const MapBackground = () => {
         "Pink_XP",
         "Blue_XP",
       ];
-      // const type = types[Math.floor(Math.random() * types.length)];
-      const type = types[2];      
+      const type = types[Math.floor(Math.random() * types.length)];
+      // const type = types[2];      
       const cfg = modelConfigs[type];
 
       return {
