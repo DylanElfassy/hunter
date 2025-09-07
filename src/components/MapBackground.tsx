@@ -693,23 +693,23 @@ const MapBackground = () => {
       };
     } = {
       Dollar_Box_Open: {
-        url: "/models/XP_Blue_V2-opt.glb",
-        scaleMultiplier: 900,
+        url: "/models/Dollar_Box_Open.glb",
+        scaleMultiplier:30,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP_2: {
         url: "/models/Black_XP_3.glb",
-        scaleMultiplier: 900,
+        scaleMultiplier: 700,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Pink_XP: {
         url: "/models/XP_Pink_NEW.glb",
-        scaleMultiplier: 900,
+        scaleMultiplier: 700,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
         url: "/models/XP_Blue_V2.glb",
-        scaleMultiplier: 900,
+        scaleMultiplier: 700,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
     };
@@ -724,16 +724,16 @@ const MapBackground = () => {
         "Pink_XP",
         "Blue_XP",
       ];
-      // const type = types[Math.floor(Math.random() * types.length)];
-      // const type = types[1];      
-const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
+      const type = types[Math.floor(Math.random() * types.length)];
+      // const type = types[0];      
+// const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
 
       const cfg = modelConfigs[type];
 
       return {
         id: `3d-model-${idx}`,
         origin: coords,
-        altitude: 150,
+        altitude: 120,
         url: cfg.url,
         scaleMultiplier: cfg.scaleMultiplier,
         rotate: cfg.rotate,
@@ -763,7 +763,7 @@ const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
         model.altitude
       );
 
-        const scale = merc.meterInMercatorCoordinateUnits() * 600;
+        const scale = merc.meterInMercatorCoordinateUnits() * model.scaleMultiplier;
 
 
       return {
@@ -778,79 +778,9 @@ const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
       };
     };
 
-    // Load model
-    // const loadModel = (model: (typeof models)[number]) => {
-    //   console.log("Loading model:", model);
-    //   const loader = new GLTFLoader();
-    //   loader.load(
-    //     model.url,
-    //     (gltf) => {
-    //       const obj = gltf.scene;
-    //       (obj as any).transform = makeTransform(model);
-
-    //       obj.traverse((child) => {
-    //         if ((child as THREE.Mesh).isMesh) {
-    //           const mesh = child as THREE.Mesh;
-    //           const mat = mesh.material;
-    //           if (Array.isArray(mat)) {
-    //             mat.forEach((m) => (m.side = THREE.DoubleSide));
-    //           } else {
-    //             mat.side = THREE.DoubleSide;
-    //           }
-    //           mesh.geometry.computeVertexNormals();
-    //         }
-    //       });
-
-    //       scene.add(obj);
-    //     },
-    //     undefined,
-    //     (err) => console.error("Error loading model:", err)
-    //   );
-    // };
-
-
     // -----------------------------
 // Load model with baked transform
 // -----------------------------
-// const loadModel = (model: (typeof models)[number]) => {
-//   console.log("Loading model:", model);
-//   const loader = new GLTFLoader();
-
-//   loader.load(
-//     model.url,
-//     (gltf) => {
-//       const obj = gltf.scene;
-
-//       // build transform matrix once
-//       const t = makeTransform(model);
-//       const objMatrix = new THREE.Matrix4()
-//         .makeTranslation(t.translateX, t.translateY, t.translateZ)
-//         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale)) // flip Y for mapbox coords
-//         .multiply(new THREE.Matrix4().makeRotationX(t.rotateX))
-//         .multiply(new THREE.Matrix4().makeRotationY(t.rotateY))
-//         .multiply(new THREE.Matrix4().makeRotationZ(t.rotateZ));
-
-//       obj.applyMatrix4(objMatrix); // bake the transform
-
-//       obj.traverse((child) => {
-//         if ((child as THREE.Mesh).isMesh) {
-//           const mesh = child as THREE.Mesh;
-//           const mat = mesh.material;
-//           if (Array.isArray(mat)) {
-//             mat.forEach((m) => (m.side = THREE.DoubleSide));
-//           } else {
-//             mat.side = THREE.DoubleSide;
-//           }
-//           mesh.geometry.computeVertexNormals();
-//         }
-//       });
-
-//       scene.add(obj);
-//     },
-//     undefined,
-//     (err) => console.error("Error loading model:", err)
-//   );
-// };
 
 const loadModel = (model: (typeof models)[number]) => {
   console.log("Loading model:", model);
@@ -871,9 +801,14 @@ const loadModel = (model: (typeof models)[number]) => {
           const mesh = child as THREE.Mesh;
           const mat = mesh.material;
           if (Array.isArray(mat)) {
-            mat.forEach((m) => (m.side = THREE.DoubleSide));
-          } else {
+            mat.forEach((m) => {
+              m.side = THREE.DoubleSide;
+              m.needsUpdate = true;          // important to refresh material
+            });          
+          }
+             else {
             mat.side = THREE.DoubleSide;
+             mat.needsUpdate = true; 
           }
           mesh.geometry.computeVertexNormals();
         }
@@ -893,98 +828,6 @@ const loadModel = (model: (typeof models)[number]) => {
     // -----------------------------
     // Custom Layer
     // -----------------------------
-//     const customLayer: mapboxgl.CustomLayerInterface = {
-//       id: "3d-models-1",
-//       type: "custom",
-//       renderingMode: "3d",
-
-//       onAdd: (map) => {
-//         renderer = new THREE.WebGLRenderer({
-//           canvas: map.getCanvas(),
-//           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//           context: (map as any).painter.context.gl,
-//           antialias: true,
-//         });
-//         renderer.autoClear = false;
-//       },
-
-//       // render: (_gl, matrix) => {
-//       //   const m = new THREE.Matrix4().fromArray(matrix);
-//       //   scene.traverse((obj) => {
-//       //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//       //     if ((obj as any).transform) {
-//       //       const t = (obj as any).transform;
-
-//       //       const rotationX = new THREE.Matrix4().makeRotationAxis(
-//       //         new THREE.Vector3(1, 0, 0),
-//       //         t.rotateX
-//       //       );
-//       //       const rotationY = new THREE.Matrix4().makeRotationAxis(
-//       //         new THREE.Vector3(0, 1, 0),
-//       //         t.rotateY
-//       //       );
-//       //       const rotationZ = new THREE.Matrix4().makeRotationAxis(
-//       //         new THREE.Vector3(0, 0, 1),
-//       //         t.rotateZ
-//       //       );
-
-//       //       const l = new THREE.Matrix4()
-//       //         .makeTranslation(t.translateX, t.translateY, t.translateZ)
-//       //         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
-//       //         .multiply(rotationX)
-//       //         .multiply(rotationY)
-//       //         .multiply(rotationZ);
-
-//       //       camera.projectionMatrix = m.clone().multiply(l);
-//       //     }
-//       //   });
-//       //   renderer.resetState();
-//       //   renderer.render(scene, camera);
-//       //   map.triggerRepaint();
-
-//       // },
-//       render: (_gl, matrix) => {
-//   const m = new THREE.Matrix4().fromArray(matrix);
-
-//   scene.traverse((obj) => {
-//     if ((obj as any).transform) {
-//       const t = (obj as any).transform;
-
-//       const rotationX = new THREE.Matrix4().makeRotationAxis(
-//         new THREE.Vector3(1, 0, 0),
-//         t.rotateX
-//       );
-//       const rotationY = new THREE.Matrix4().makeRotationAxis(
-//         new THREE.Vector3(0, 1, 0),
-//         t.rotateY
-//       );
-//       const rotationZ = new THREE.Matrix4().makeRotationAxis(
-//         new THREE.Vector3(0, 0, 1),
-//         t.rotateZ
-//       );
-
-//       const l = new THREE.Matrix4()
-//         .makeTranslation(t.translateX, t.translateY, t.translateZ)
-//         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
-//         .multiply(rotationX)
-//         .multiply(rotationY)
-//         .multiply(rotationZ);
-
-//       // bake the final projection into each object’s matrix
-//       obj.matrixAutoUpdate = false;
-//       obj.matrix.copy(m).multiply(l);
-//     }
-//   });
-
-//   // render once for the whole scene
-//   camera.projectionMatrix = new THREE.Matrix4(); // identity — handled in obj.matrix
-//   renderer.resetState();
-//   renderer.render(scene, camera);
-
-//   map.triggerRepaint();
-// }
-
-//     };
 
 const customLayer: mapboxgl.CustomLayerInterface = {
   id: "3d-models-1",
@@ -997,22 +840,16 @@ const customLayer: mapboxgl.CustomLayerInterface = {
         canvas: map.getCanvas(),
         context: (map as any).painter.context.gl,
         antialias: true,
+         alpha: true,
       });
+
+      
 
       // Avoid Safari blowing up GPU memory
       // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.autoClear = false;
     }
   },
-      //   onAdd: (map) => {
-      //   renderer = new THREE.WebGLRenderer({
-      //     canvas: map.getCanvas(),
-      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //     context: (map as any).painter.context.gl,
-      //     antialias: true,
-      //   });
-      //   renderer.autoClear = false;
-      // },
 
   render: (_gl, matrix) => {
     const m = new THREE.Matrix4().fromArray(matrix);
