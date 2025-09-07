@@ -862,7 +862,7 @@ const loadModel = (model: (typeof models)[number]) => {
       // store transform for use in render
       (obj as any).transform = makeTransform(model);
 
-          (obj as any).transform.scale *= Math.pow(2, map.getZoom() - 15);
+          // (obj as any).transform.scale *= Math.pow(2, map.getZoom() - 15);
 
       obj.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
