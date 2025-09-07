@@ -693,7 +693,7 @@ const MapBackground = () => {
       };
     } = {
       Dollar_Box_Open: {
-        url: "/models/box1-opt.glb",
+        url: "/models/XP_Blue_V2-opt.glb",
         scaleMultiplier: 40,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
