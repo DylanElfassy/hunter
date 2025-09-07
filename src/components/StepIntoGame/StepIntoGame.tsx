@@ -6,7 +6,7 @@ import ellipse from "../../assets/Ellipse_2.png"; // update path as needed
 import prizeIcon from "../../assets/Prize_2.png"; // update path as needed
 import prizeIcon_2 from "../../assets/Prize.png"; // update path as needed
 import prizeIcon_3 from "../../assets/Prize_3.png"; // update path as needed
-import timer from "../../assets/Timer.png"; // update path as needed
+import timer from "../../assets/Timer_3.png"; // update path as needed
 import timer2 from "../../assets/Timer_2.png"; // update path as needed
 import cardRose from "../../assets/Rose_card_2.png"; // update path as needed
 import cardWhite from "../../assets/Golden_Card.png"; // update path as needed
@@ -20,6 +20,7 @@ import pink from "../../assets/Pink_flash.png"; // update path as needed
 import xp2 from "../../assets/XP2.png"; // update path as needed
 import xp3 from "../../assets/XP4.png"; // update path as needed
 import golden from "../../assets/gold.png"; // update path as needed
+import double_card from "../../assets/Double_Card.png"; // update path as needed
 
 const StepIntoGameSection: React.FC = () => (
   <section 
@@ -112,7 +113,7 @@ const StepIntoGameSection: React.FC = () => (
 
     {/* Slightly higher dashed vertical line */}
     <div
-      className="mt-1 w-[2px] h-40 bg-transparent"
+      className="mt-1 w-[2px] h-32 sm:h-40 bg-transparent"
       style={{
  backgroundImage: `repeating-linear-gradient(
       to bottom,
@@ -354,7 +355,7 @@ const StepIntoGameSection: React.FC = () => (
 <div className="absolute top-[12rem] sm:top-[9rem] md:top-[16rem]   xl:top-[17rem] lg:top-[14rem] 2xl:top-[18rem] left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center md:w-[250px]">
   {/* Timer icon */}
   <Image
-    src={timer2}
+    src={timer}
     alt="timer icon"
     width={120}
     height={64}
@@ -388,19 +389,19 @@ description={
   }> 
 <div className="flex flex-col justify-center items-center mt-6 w-full">
   <Image
-    src={cardRose}
+    src={double_card}
     alt="Card Rose"
     width={400}
     height={150}
     className="w-full max-w-[350px] w-[350px] h-auto z-[1]"
   />
-  <Image
+  {/* <Image
     src={cardWhite}
     alt="Card White"
     width={400}
     height={150}
     className="-mt-25 w-full max-w-[350px] w-[350px]  h-auto"
-  />
+  /> */}
 </div>
 
 </StepCard>

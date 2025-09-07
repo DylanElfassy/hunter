@@ -29,7 +29,7 @@ const StepCard: React.FC<StepCardProps> = ({
           <h3 className="text-hunterz-grey font-Jakarta font-bold text-lg md:text-xl mb-2 group-hover:text-hunterz-black transition-colors">
             {title}
           </h3>
-          <p className="text-[#606060] font-Jakarta text-lg leading-relaxed">
+          <p className="text-[#606060] font-Jakarta text-base sm:text-lg leading-relaxed">
             {description}
           </p>
         </div>
