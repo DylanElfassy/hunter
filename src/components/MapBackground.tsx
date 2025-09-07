@@ -660,11 +660,11 @@ const MapBackground = () => {
     const treasureCoords: [number, number][] = [
       [-73.969, 40.7644],
       [-73.9677, 40.7723],
-      [-73.9774, 40.7794],
-      [-73.9752, 40.7580],
+      // [-73.9774, 40.7794],
+      // [-73.9752, 40.7580],
       [-73.9862, 40.7656],
-      // [-73.9818, 40.7740],
-      // [-73.9785, 40.7639],
+      [-73.9818, 40.7740],
+      [-73.9785, 40.7639],
       // [-73.9649, 40.7676],
       // [-73.9442, 40.6782],
       // [-73.9810, 40.6450],
@@ -694,8 +694,8 @@ const MapBackground = () => {
     } = {
       Dollar_Box_Open: {
         url: "/models/box1-opt.glb",
-        scaleMultiplier: 1,
-        rotate: [0, 0, 0],
+        scaleMultiplier: 40,
+        rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP_2: {
         url: "/models/Black_XP_3-opt.glb",
