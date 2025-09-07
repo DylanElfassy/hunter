@@ -694,7 +694,7 @@ const MapBackground = () => {
     } = {
       Dollar_Box_Open: {
         url: "/models/XP_Blue_V2-opt.glb",
-        scaleMultiplier: 40,
+        scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP_2: {
