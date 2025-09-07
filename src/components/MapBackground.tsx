@@ -724,8 +724,8 @@ const MapBackground = () => {
         "Pink_XP",
         "Blue_XP",
       ];
-      const type = types[Math.floor(Math.random() * types.length)];
-      // const type = types[2];      
+      // const type = types[Math.floor(Math.random() * types.length)];
+      const type = types[1];      
       const cfg = modelConfigs[type];
 
       return {
