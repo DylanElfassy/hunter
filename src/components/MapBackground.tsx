@@ -708,7 +708,7 @@ const MapBackground = () => {
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
-        url: "/models/XP_Blue_V2-opt.glb",
+        url: "/models/XP_Blue_V2.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
@@ -1108,11 +1108,11 @@ const customLayer: mapboxgl.CustomLayerInterface = {
     map.removeSource("3d-models-1");
   }
 
-  if (renderer) {
-    renderer.dispose();
-    renderer.forceContextLoss?.(); // Safari: ensure GL context released
-    renderer = undefined as any;
-  }
+  // if (renderer) {
+  //   renderer.dispose();
+  //   renderer.forceContextLoss?.(); // Safari: ensure GL context released
+  //   renderer = undefined as any;
+  // }
 
   map.remove();
 };
