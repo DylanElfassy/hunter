@@ -761,6 +761,9 @@ const MapBackground = () => {
         model.altitude
       );
 
+        const scale = merc.meterInMercatorCoordinateUnits() * 600;
+
+
       return {
         translateX: merc.x,
         translateY: merc.y,
@@ -768,7 +771,8 @@ const MapBackground = () => {
         rotateX: model.rotate[0],
         rotateY: model.rotate[1],
         rotateZ: model.rotate[2],
-        scale: merc.meterInMercatorCoordinateUnits() * model.scaleMultiplier,
+        // scale: merc.meterInMercatorCoordinateUnits() * model.scaleMultiplier,
+        scale,
       };
     };
 
@@ -857,6 +861,8 @@ const loadModel = (model: (typeof models)[number]) => {
 
       // store transform for use in render
       (obj as any).transform = makeTransform(model);
+
+          (obj as any).transform.scale *= Math.pow(2, map.getZoom() - 15);
 
       obj.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
