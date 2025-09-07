@@ -698,7 +698,7 @@ const MapBackground = () => {
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP_2: {
-        url: "/models/Black_XP_3-opt.glb",
+        url: "/models/Black_XP_3.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
@@ -725,8 +725,8 @@ const MapBackground = () => {
         "Blue_XP",
       ];
       // const type = types[Math.floor(Math.random() * types.length)];
-      const type = types[1];      
-      // const type = types[Math.random() < 0.5 ? 2 : 3];
+      // const type = types[1];      
+const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
 
       const cfg = modelConfigs[type];
 
