@@ -660,24 +660,24 @@ const MapBackground = () => {
     const treasureCoords: [number, number][] = [
       [-73.969, 40.7644],
       [-73.9677, 40.7723],
-      [-73.9774, 40.7794],
-      [-73.9752, 40.7580],
-      [-73.9862, 40.7656],
-      [-73.9818, 40.7740],
-      [-73.9785, 40.7639],
-      [-73.9649, 40.7676],
-      [-73.9442, 40.6782],
-      [-73.9810, 40.6450],
-      [-73.9500, 40.6820],
-      [-73.8500, 40.7420],
-      [-73.8700, 40.7500],
-      [-73.8200, 40.7350],
-      [-73.8900, 40.8500],
-      [-73.8800, 40.8400],
-      [-73.9000, 40.8600],
-      [-74.1200, 40.5795],
-      [-74.1500, 40.5700],
-      [-74.1000, 40.5800],
+      // [-73.9774, 40.7794],
+      // [-73.9752, 40.7580],
+      // [-73.9862, 40.7656],
+      // [-73.9818, 40.7740],
+      // [-73.9785, 40.7639],
+      // [-73.9649, 40.7676],
+      // [-73.9442, 40.6782],
+      // [-73.9810, 40.6450],
+      // [-73.9500, 40.6820],
+      // [-73.8500, 40.7420],
+      // [-73.8700, 40.7500],
+      // [-73.8200, 40.7350],
+      // [-73.8900, 40.8500],
+      // [-73.8800, 40.8400],
+      // [-73.9000, 40.8600],
+      // [-74.1200, 40.5795],
+      // [-74.1500, 40.5700],
+      // [-74.1000, 40.5800],
     ];
 
     // -----------------------------
@@ -703,7 +703,7 @@ const MapBackground = () => {
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Pink_XP: {
-        url: "/models/XP_Pink_V2.glb",
+        url: "/models/XP_Pink_NEW.glb",
         scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
@@ -724,8 +724,8 @@ const MapBackground = () => {
         "Pink_XP",
         "Blue_XP",
       ];
-      const type = types[Math.floor(Math.random() * types.length)];
-      // const type = types[2];      
+      // const type = types[Math.floor(Math.random() * types.length)];
+      const type = types[2];      
       const cfg = modelConfigs[type];
 
       return {
@@ -885,98 +885,169 @@ const loadModel = (model: (typeof models)[number]) => {
     // -----------------------------
     // Custom Layer
     // -----------------------------
-    const customLayer: mapboxgl.CustomLayerInterface = {
-      id: "3d-models-1",
-      type: "custom",
-      renderingMode: "3d",
+//     const customLayer: mapboxgl.CustomLayerInterface = {
+//       id: "3d-models-1",
+//       type: "custom",
+//       renderingMode: "3d",
 
-      onAdd: (map) => {
-        renderer = new THREE.WebGLRenderer({
-          canvas: map.getCanvas(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          context: (map as any).painter.context.gl,
-          antialias: true,
-        });
-        renderer.autoClear = false;
-      },
+//       onAdd: (map) => {
+//         renderer = new THREE.WebGLRenderer({
+//           canvas: map.getCanvas(),
+//           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//           context: (map as any).painter.context.gl,
+//           antialias: true,
+//         });
+//         renderer.autoClear = false;
+//       },
 
-      // render: (_gl, matrix) => {
-      //   const m = new THREE.Matrix4().fromArray(matrix);
-      //   scene.traverse((obj) => {
-      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //     if ((obj as any).transform) {
-      //       const t = (obj as any).transform;
+//       // render: (_gl, matrix) => {
+//       //   const m = new THREE.Matrix4().fromArray(matrix);
+//       //   scene.traverse((obj) => {
+//       //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//       //     if ((obj as any).transform) {
+//       //       const t = (obj as any).transform;
 
-      //       const rotationX = new THREE.Matrix4().makeRotationAxis(
-      //         new THREE.Vector3(1, 0, 0),
-      //         t.rotateX
-      //       );
-      //       const rotationY = new THREE.Matrix4().makeRotationAxis(
-      //         new THREE.Vector3(0, 1, 0),
-      //         t.rotateY
-      //       );
-      //       const rotationZ = new THREE.Matrix4().makeRotationAxis(
-      //         new THREE.Vector3(0, 0, 1),
-      //         t.rotateZ
-      //       );
+//       //       const rotationX = new THREE.Matrix4().makeRotationAxis(
+//       //         new THREE.Vector3(1, 0, 0),
+//       //         t.rotateX
+//       //       );
+//       //       const rotationY = new THREE.Matrix4().makeRotationAxis(
+//       //         new THREE.Vector3(0, 1, 0),
+//       //         t.rotateY
+//       //       );
+//       //       const rotationZ = new THREE.Matrix4().makeRotationAxis(
+//       //         new THREE.Vector3(0, 0, 1),
+//       //         t.rotateZ
+//       //       );
 
-      //       const l = new THREE.Matrix4()
-      //         .makeTranslation(t.translateX, t.translateY, t.translateZ)
-      //         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
-      //         .multiply(rotationX)
-      //         .multiply(rotationY)
-      //         .multiply(rotationZ);
+//       //       const l = new THREE.Matrix4()
+//       //         .makeTranslation(t.translateX, t.translateY, t.translateZ)
+//       //         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
+//       //         .multiply(rotationX)
+//       //         .multiply(rotationY)
+//       //         .multiply(rotationZ);
 
-      //       camera.projectionMatrix = m.clone().multiply(l);
-      //     }
-      //   });
-      //   renderer.resetState();
-      //   renderer.render(scene, camera);
-      //   map.triggerRepaint();
+//       //       camera.projectionMatrix = m.clone().multiply(l);
+//       //     }
+//       //   });
+//       //   renderer.resetState();
+//       //   renderer.render(scene, camera);
+//       //   map.triggerRepaint();
 
-      // },
-      render: (_gl, matrix) => {
-  const m = new THREE.Matrix4().fromArray(matrix);
+//       // },
+//       render: (_gl, matrix) => {
+//   const m = new THREE.Matrix4().fromArray(matrix);
 
-  scene.traverse((obj) => {
-    if ((obj as any).transform) {
-      const t = (obj as any).transform;
+//   scene.traverse((obj) => {
+//     if ((obj as any).transform) {
+//       const t = (obj as any).transform;
 
-      const rotationX = new THREE.Matrix4().makeRotationAxis(
-        new THREE.Vector3(1, 0, 0),
-        t.rotateX
-      );
-      const rotationY = new THREE.Matrix4().makeRotationAxis(
-        new THREE.Vector3(0, 1, 0),
-        t.rotateY
-      );
-      const rotationZ = new THREE.Matrix4().makeRotationAxis(
-        new THREE.Vector3(0, 0, 1),
-        t.rotateZ
-      );
+//       const rotationX = new THREE.Matrix4().makeRotationAxis(
+//         new THREE.Vector3(1, 0, 0),
+//         t.rotateX
+//       );
+//       const rotationY = new THREE.Matrix4().makeRotationAxis(
+//         new THREE.Vector3(0, 1, 0),
+//         t.rotateY
+//       );
+//       const rotationZ = new THREE.Matrix4().makeRotationAxis(
+//         new THREE.Vector3(0, 0, 1),
+//         t.rotateZ
+//       );
 
-      const l = new THREE.Matrix4()
-        .makeTranslation(t.translateX, t.translateY, t.translateZ)
-        .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
-        .multiply(rotationX)
-        .multiply(rotationY)
-        .multiply(rotationZ);
+//       const l = new THREE.Matrix4()
+//         .makeTranslation(t.translateX, t.translateY, t.translateZ)
+//         .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
+//         .multiply(rotationX)
+//         .multiply(rotationY)
+//         .multiply(rotationZ);
 
-      // bake the final projection into each object’s matrix
-      obj.matrixAutoUpdate = false;
-      obj.matrix.copy(m).multiply(l);
+//       // bake the final projection into each object’s matrix
+//       obj.matrixAutoUpdate = false;
+//       obj.matrix.copy(m).multiply(l);
+//     }
+//   });
+
+//   // render once for the whole scene
+//   camera.projectionMatrix = new THREE.Matrix4(); // identity — handled in obj.matrix
+//   renderer.resetState();
+//   renderer.render(scene, camera);
+
+//   map.triggerRepaint();
+// }
+
+//     };
+
+const customLayer: mapboxgl.CustomLayerInterface = {
+  id: "3d-models-1",
+  type: "custom",
+  renderingMode: "3d",
+
+  onAdd: (map) => {
+    if (!renderer) {
+      renderer = new THREE.WebGLRenderer({
+        canvas: map.getCanvas(),
+        context: (map as any).painter.context.gl,
+        antialias: true,
+      });
+
+      // Avoid Safari blowing up GPU memory
+      // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.autoClear = false;
     }
-  });
+  },
+      //   onAdd: (map) => {
+      //   renderer = new THREE.WebGLRenderer({
+      //     canvas: map.getCanvas(),
+      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //     context: (map as any).painter.context.gl,
+      //     antialias: true,
+      //   });
+      //   renderer.autoClear = false;
+      // },
 
-  // render once for the whole scene
-  camera.projectionMatrix = new THREE.Matrix4(); // identity — handled in obj.matrix
-  renderer.resetState();
-  renderer.render(scene, camera);
+  render: (_gl, matrix) => {
+    const m = new THREE.Matrix4().fromArray(matrix);
 
-  map.triggerRepaint();
-}
+    // Apply transforms per model each frame
+    scene.traverse((obj) => {
+      if ((obj as any).transform) {
+        const t = (obj as any).transform;
 
-    };
+        const rotationX = new THREE.Matrix4().makeRotationAxis(
+          new THREE.Vector3(1, 0, 0),
+          t.rotateX
+        );
+        const rotationY = new THREE.Matrix4().makeRotationAxis(
+          new THREE.Vector3(0, 1, 0),
+          t.rotateY
+        );
+        const rotationZ = new THREE.Matrix4().makeRotationAxis(
+          new THREE.Vector3(0, 0, 1),
+          t.rotateZ
+        );
+
+        const l = new THREE.Matrix4()
+          .makeTranslation(t.translateX, t.translateY, t.translateZ)
+          .scale(new THREE.Vector3(t.scale, -t.scale, t.scale))
+          .multiply(rotationX)
+          .multiply(rotationY)
+          .multiply(rotationZ);
+
+        obj.matrixAutoUpdate = false;
+        obj.matrix.copy(m).multiply(l);
+      }
+    });
+
+    // Clear & render with reset state
+    renderer.resetState();
+    camera.projectionMatrix = new THREE.Matrix4(); // identity, since projection baked in obj.matrix
+    renderer.render(scene, camera);
+
+    map.triggerRepaint();
+  },
+};
+
 
     // -----------------------------
     // Map events & animation
@@ -1002,14 +1073,44 @@ const loadModel = (model: (typeof models)[number]) => {
       startTimeout = setTimeout(animate, 8000);
       setTimeout(() => setLoading(false), 5000);
 
+  //       if (!renderer) {
+  //   renderer = new THREE.WebGLRenderer({
+  //     canvas: map.getCanvas(),
+  //     context: (map as any).painter.context.gl,
+  //     antialias: true,
+  //   });
+  //   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // prevent iOS GPU crash
+  //   renderer.autoClear = false;
+  // }
+
       map.addLayer(customLayer);
     });
 
+    // return () => {
+    //   cancelAnimationFrame(animationFrameId);
+    //   clearTimeout(startTimeout);
+    //   map.remove();
+    // };
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      clearTimeout(startTimeout);
-      map.remove();
-    };
+  cancelAnimationFrame(animationFrameId);
+  clearTimeout(startTimeout);
+
+  if (map.getLayer("3d-models-1")) {
+    map.removeLayer("3d-models-1");
+  }
+  if (map.getSource("3d-models-1")) {
+    map.removeSource("3d-models-1");
+  }
+
+  if (renderer) {
+    renderer.dispose();
+    renderer.forceContextLoss?.(); // Safari: ensure GL context released
+    renderer = undefined as any;
+  }
+
+  map.remove();
+};
+
   }, []);
 
   return (
