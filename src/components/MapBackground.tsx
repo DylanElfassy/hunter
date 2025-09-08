@@ -897,6 +897,11 @@ const customLayer: mapboxgl.CustomLayerInterface = {
 
       // Avoid Safari blowing up GPU memory
       // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const isSafariMobile = /iP(hone|od|ad)|Safari/.test(navigator.userAgent) && /AppleWebKit/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+
+if (isSafariMobile) {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+}
       renderer.autoClear = false;
     }
   },

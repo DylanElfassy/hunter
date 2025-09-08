@@ -511,111 +511,200 @@ if (!id) return;
     console.log("[React] Unity bridge setup complete");
   };
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
+useEffect(() => {
+  if (!mapContainer.current) return;
 
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/standard",
-      center: [-73.976, 40.769],
+  const map = new mapboxgl.Map({
+    container: mapContainer.current,
+    style: "mapbox://styles/mapbox/standard",
+    center: [-73.976, 40.769],
+    zoom: 16,
+    pitch: 75,
+    bearing: -110,
+    interactive: true,
+    antialias: true,
+  });
+
+  map.on("style.load", () => {
+    map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+    map.setConfigProperty("basemap", "showPlaceLabels", false);
+    map.setConfigProperty("basemap", "showRoadLabels", false);
+    map.setConfigProperty("basemap", "showTransitLabels", false);
+    map.setConfigProperty("basemap", "lightPreset", "dusk");
+    map.setConfigProperty("basemap", "show3dObjects", true);
+  });
+
+    const testMarkers : MarkerData[] = [
+  { id: "hadera_park", coords: [34.9170, 32.4400], type: "Pink_XP" }, // Hadera Stream Park
+  { id: "hadera_station", coords: [34.9230, 32.4430], type: "Blue_XP" }, // Hadera Railway Station
+];
+
+  // --- CALL add3DMarkers on load ---
+  map.on("load", () => {
+    add3DMarkers(testMarkers);
+  });
+
+
+  // --- CENTER MAP ON USER LOCATION ---
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        map.setCenter([longitude, latitude]);
+      },
+      (err) => {
+        console.warn("Could not get user location:", err);
+      },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  const geolocateControl = new mapboxgl.GeolocateControl({
+    positionOptions: { enableHighAccuracy: true },
+    trackUserLocation: true,
+    showUserHeading: true,
+  });
+
+  map.addControl(geolocateControl, "bottom-right");
+
+  // --- CREATE CUSTOM CONTROL (3D + AR) ---
+  const customCtrl = document.createElement("div");
+  customCtrl.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+customCtrl.style.background = "transparent"; // <-- makes background transparent
+
+  // 3D button
+  const btn3D = document.createElement("button");
+  btn3D.innerHTML = "3D";
+  btn3D.className = "mapboxgl-ctrl-icon threeD_button";
+  btn3D.style.fontWeight = "bold";
+  btn3D.style.fontSize = "28px";
+  btn3D.onclick = () => {
+    const center = map.getCenter();
+    map.easeTo({
+      center,
       zoom: 16,
-      pitch: 75,
-      bearing: -110,
-      interactive: true,
-      antialias: true,
+      pitch: 60,
+      bearing: -30,
+      duration: 2000,
     });
+  };
+  customCtrl.appendChild(btn3D);
 
-    map.on("style.load", () => {
-      map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
-      map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", false);
-      map.setConfigProperty("basemap", "showTransitLabels", false);
-      map.setConfigProperty("basemap", "lightPreset", "dusk");
-      map.setConfigProperty("basemap", "show3dObjects", true);
-    });
+// AR button
+const btnAR = document.createElement("button");
+btnAR.innerHTML = "AR";
+btnAR.className = "mapboxgl-ctrl-icon ar_button";
+btnAR.style.fontWeight = "bold";
+btnAR.style.fontSize = "28px";
+btnAR.onclick = () => {
+  sendToUnity({ type: "activateAR" }); // <-- hook to Unity
+};
+customCtrl.appendChild(btnAR);
 
-      // --- CENTER MAP ON USER LOCATION ---
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          console.log(pos)
-          map.setCenter([longitude, latitude]);
-        },
-        (err) => {
-          console.warn("Could not get user location:", err);
-        },
-        { enableHighAccuracy: true }
-      );
+  map.addControl(
+    {
+      onAdd: () => customCtrl,
+      onRemove: () => {
+        customCtrl.parentNode?.removeChild(customCtrl);
+      },
+    },
+    "bottom-right"
+  );
+
+  // --- STYLE GEOLOCATE BUTTON (observer remains same) ---
+  const observer = new MutationObserver(() => {
+    const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
+    if (button) {
+      if (window.innerWidth < 640) {
+        button.style.width = "56px";
+        button.style.height = "56px";
+      } else {
+        button.style.width = "48px";
+        button.style.height = "48px";
+      }
+       button.style.background =
+      "linear-gradient(215deg, rgba(255,255,255,1) 0%, rgba(196,168,123,1) 64%, rgba(196,168,123,1) 80%)";
+   
+      button.style.zIndex = "10000";
+      button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
+      button.style.border = "none";
+      observer.disconnect();
     }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
+  // --- STYLE AR BUTTON USING OBSERVER ---
+const arObserver = new MutationObserver(() => {
+  const arButton = document.querySelector(".ar_button") as HTMLElement;
+  if (arButton) {
+    arButton.style.background =
+      "linear-gradient(215deg, rgba(255,255,255,1) 0%, rgba(196,168,123,1) 64%, rgba(196,168,123,1) 80%)";
+    arButton.style.color = "#030102";
+    arButton.style.fontWeight = "bold";
+    arButton.style.fontSize = "20px";
+    arButton.style.border = "none";
+    arButton.style.cursor = "pointer";
+    // arButton.style.boxShadow = "inset 0px 3.35px 35.95px 0px #FFFFFF";
+     arButton.style.width = "48px";
+     arButton.style.height = "48px";
+     arButton.style.textAlign = "center";
 
-    // map.on("zoom", () => {
-    //   if (map.getZoom() > 15) map.setConfigProperty("basemap", "show3dObjects", true);
-    //   else map.setConfigProperty("basemap", "show3dObjects", false);
-    // });
+    // Hover effect
+    arButton.onmouseenter = () => { arButton.style.transform = "scale(1.05)"; };
+    arButton.onmouseleave = () => { arButton.style.transform = "scale(1)"; };
 
-    const geolocateControl = new mapboxgl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true,
-      showUserHeading: true,
-    });
-
-    map.addControl(geolocateControl, "bottom-right");
-
-    const observer = new MutationObserver(() => {
-      const button = document.querySelector(".mapboxgl-ctrl-geolocate") as HTMLElement;
-      if (button) {
-          if (window.innerWidth < 640) { // mobile breakpoint
-         button.style.width = "56px";
-        button.style.height = "56px";// mobile
-      } else {
-         button.style.width = "48px";
-        button.style.height = "48px";// desktop
-      }
-       
-        button.style.zIndex = "10000";
-        button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
-        button.style.border = "none";
-        observer.disconnect();
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-   const observer_1 = new MutationObserver(() => {
-  const controls = document.querySelectorAll(
-    ".mapboxgl-ctrl-bottom-right .mapboxgl-ctrl"
-  ) as NodeListOf<HTMLElement>;
-
-  if (controls.length) {
-    controls.forEach((ctrl) => {
-      // Check screen width
-      if (window.innerWidth < 640) { // mobile breakpoint
-        ctrl.style.margin = "0px 24px 25px 0px"; // mobile
-      } else {
-        ctrl.style.margin = "0px 20px 20px 0px"; // desktop
-      }
-    });
-    observer_1.disconnect();
+    arObserver.disconnect(); // stop observing once styled
   }
 });
 
-observer_1.observe(document.body, { childList: true, subtree: true });
-    mapRef.current = map;
-    setupUnityBridge();
+arObserver.observe(document.body, { childList: true, subtree: true });
 
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      routePointMarkersRef.current = [];
-    };
-  }, []);
+
+
+  // --- STYLE 3d BUTTON USING OBSERVER ---
+const threeDObserver = new MutationObserver(() => {
+  const threeDButton = document.querySelector(".threeD_button") as HTMLElement;
+  if (threeDButton) {
+    threeDButton.style.background =
+      "linear-gradient(215deg, rgba(255,255,255,1) 0%, rgba(196,168,123,1) 64%, rgba(196,168,123,1) 80%)";
+    threeDButton.style.color = "#030102";
+    threeDButton.style.fontWeight = "bold";
+    threeDButton.style.fontSize = "20px";
+    threeDButton.style.border = "none";
+    threeDButton.style.cursor = "pointer";
+    // arButton.style.boxShadow = "inset 0px 3.35px 35.95px 0px #FFFFFF";
+     threeDButton.style.width = "48px";
+     threeDButton.style.height = "48px";
+     threeDButton.style.textAlign = "center";
+     threeDButton.style.marginBottom = "10px";
+
+
+    // Hover effect
+    threeDButton.onmouseenter = () => { threeDButton.style.transform = "scale(1.05)"; };
+    threeDButton.onmouseleave = () => { threeDButton.style.transform = "scale(1)"; };
+
+    threeDObserver.disconnect(); // stop observing once styled
+  }
+});
+
+threeDObserver.observe(document.body, { childList: true, subtree: true });
+
+  mapRef.current = map;
+  setupUnityBridge();
+
+  return () => {
+    map.remove();
+    mapRef.current = null;
+    routePointMarkersRef.current = [];
+  };
+}, []);
+
+
 
   return (
     <div className="absolute w-full h-full z-0">
       <div ref={mapContainer} className="w-full h-full" />
-     <button
+     {/* <button
   onClick={() => sendToUnity({ type: "activateAR" })}
   className="
     absolute right-4 bottom-40 sm:bottom-32
@@ -632,7 +721,7 @@ observer_1.observe(document.body, { childList: true, subtree: true });
   "
 >
   AR
-</button>
+</button> */}
     </div>
   );
 };
