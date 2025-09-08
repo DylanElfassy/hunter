@@ -730,17 +730,49 @@ const treasureCoords: [number, number][] =
     // -----------------------------
     // Build models array
     // -----------------------------
+    let usedGroup1 = false;
+    let usedGroup2 = false;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
     const models = treasureCoords.map((coords, idx) => {
-      const types: ModelType[] = [
-        "Dollar_Box_Open",
-        "Black_XP_2",
-        "Pink_XP",
-        "Blue_XP",
-      ];
-      const type = types[Math.floor(Math.random() * types.length)];
+      // const types: ModelType[] = [
+      //   "Dollar_Box_Open",
+      //   "Black_XP_2",
+      //   "Pink_XP",
+      //   "Blue_XP",
+      // ];
+      // const type = types[Math.floor(Math.random() * types.length)];
       // const type = types[0];      
 // const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
 
+ const group1: ModelType[] = ["Dollar_Box_Open"];
+  const group2: ModelType[] = ["Black_XP_2"];
+  const others: ModelType[] = ["Pink_XP", "Blue_XP"];
+
+  let type: ModelType;
+
+  if (isMobile) {
+    // --- Mobile logic: at most 1 from group1 + group2 ---
+    if (!usedGroup1 && Math.random() < 0.5) {
+      type = group1[0];
+      usedGroup1 = true;
+    } else if (!usedGroup2 && Math.random() < 0.5) {
+      type = group2[0];
+      usedGroup2 = true;
+    } else {
+      type = others[Math.floor(Math.random() * others.length)];
+    }
+  } else {
+    // --- Desktop logic: original random selection ---
+    const types: ModelType[] = [
+      "Dollar_Box_Open",
+      "Black_XP_2",
+      "Pink_XP",
+      "Blue_XP",
+    ];
+    type = types[Math.floor(Math.random() * types.length)];
+  }
+  
       const cfg = modelConfigs[type];
 
       return {
