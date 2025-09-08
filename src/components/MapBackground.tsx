@@ -721,8 +721,8 @@ const treasureCoords: [number, number][] =
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
-        url: "/models/XP_Blue_V2.glb",
-        scaleMultiplier: 700,
+        url: "/models/BlueXP.glb",
+        scaleMultiplier: 20,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
     };
@@ -767,6 +767,7 @@ const treasureCoords: [number, number][] =
       "Blue_XP",
     ];
     type = types[Math.floor(Math.random() * types.length)];
+    // type = types[3];
   }
 
       const cfg = modelConfigs[type];
