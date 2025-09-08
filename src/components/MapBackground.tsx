@@ -700,6 +700,7 @@ const mobileTreasureCoords: [number, number][] = [
 // Use mobile or full list depending on viewport width
 const treasureCoords: [number, number][] =
   window.innerWidth <= 768 ? mobileTreasureCoords : allTreasureCoords;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
     // -----------------------------
     // Model configurations
@@ -715,22 +716,22 @@ const treasureCoords: [number, number][] =
     } = {
       Dollar_Box_Open: {
         url: "/models/Dollar_Box_Open.glb",
-        scaleMultiplier:30,
+        scaleMultiplier: isMobile ? 20 : 30,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Black_XP_2: {
         url: "/models/Black_XP_3.glb",
-        scaleMultiplier: 900,
+        scaleMultiplier: isMobile ? 500 : 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Pink_XP: {
         url: "/models/XP_Pink_NEW.glb",
-        scaleMultiplier: 900,
+        scaleMultiplier: isMobile ? 500 : 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
         url: "/models/BlueXP.glb",
-        scaleMultiplier: 25,
+        scaleMultiplier: isMobile ? 20 : 30,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
     };
@@ -740,7 +741,6 @@ const treasureCoords: [number, number][] =
     // -----------------------------
    let pickedFromGroup = false;
 
-    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
     const models = treasureCoords.map((coords, idx) => {
       // const types: ModelType[] = [
@@ -897,11 +897,7 @@ const customLayer: mapboxgl.CustomLayerInterface = {
 
       // Avoid Safari blowing up GPU memory
       // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      const isSafariMobile = /iP(hone|od|ad)|Safari/.test(navigator.userAgent) && /AppleWebKit/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-
-if (isSafariMobile) {
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-}
+     
       renderer.autoClear = false;
     }
   },
