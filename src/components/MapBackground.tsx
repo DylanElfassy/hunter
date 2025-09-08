@@ -1,4 +1,6 @@
-// "use client";
+// #region IMAGE WITH DIV PER IMAGE
+// PART 1: IMAGE WITH DIV PER IMAGE
+//"use client";
 
 // import React, { useRef, useEffect } from "react";
 // import mapboxgl from "mapbox-gl";
@@ -140,8 +142,9 @@
 // };
 
 // export default MapBackground;
+// #endregion
 
-
+// #region IMAGE WITH MARKER + CLUSTERING
 // "use client";
 
 // import React, { useRef, useEffect, useState } from "react";
@@ -329,6 +332,9 @@
 
 // export default MapBackground;
 
+// #endregion
+
+// #region 3D MODELS ON MAP WITH LAYER PER MODEL
 // "use client";
 
 // import React, { useRef, useEffect, useState } from "react";
@@ -624,7 +630,9 @@
 // };
 
 // export default MapBackground;
+// #endregion
 
+// #region 3D MODELS ON MAP WITH ONE CUSTOM LAYER
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -712,17 +720,17 @@ const treasureCoords: [number, number][] =
       },
       Black_XP_2: {
         url: "/models/Black_XP_3.glb",
-        scaleMultiplier: 700,
+        scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Pink_XP: {
         url: "/models/XP_Pink_NEW.glb",
-        scaleMultiplier: 700,
+        scaleMultiplier: 900,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
       Blue_XP: {
         url: "/models/BlueXP.glb",
-        scaleMultiplier: 20,
+        scaleMultiplier: 25,
         rotate: [Math.PI / 2, Math.PI, 0],
       },
     };
@@ -775,7 +783,7 @@ const treasureCoords: [number, number][] =
       return {
         id: `3d-model-${idx}`,
         origin: coords,
-        altitude: 150,
+        altitude: 180,
         url: cfg.url,
         scaleMultiplier: cfg.scaleMultiplier,
         rotate: cfg.rotate,
@@ -1020,3 +1028,5 @@ const customLayer: mapboxgl.CustomLayerInterface = {
 };
 
 export default MapBackground;
+
+// #endregion

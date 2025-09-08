@@ -19,8 +19,8 @@ const UnitySimulator = () => {
 
   // Sample markers (no imgUrl now)
   const sampleMarkers = [
-    { id: "sim1", coords: [-73.9690, 40.7644] },
-    { id: "sim2", coords: [-73.980, 40.770] },
+    { id: "sim1", coords: [-73.9690, 40.7644], type: "Pink_XP"  },
+    { id: "sim2", coords: [-73.980, 40.770], type: "Blue_XP"  },
   ];
 
   const sendAddMarkers = () => {

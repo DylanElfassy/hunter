@@ -144,7 +144,7 @@ declare global {
 interface MarkerData {
   id: string;
   coords: [number, number];
-  type?: "Dollar_Box_Open" | "Black_XP";
+  type?: "Dollar_Box_Open" | "Black_XP_2" | "Pink_XP" | "Blue_XP";
 }
 
 interface RoutePoint {
@@ -160,8 +160,26 @@ const markersRef = useRef<
 >({});
 
   const modelConfigs = {
-    Dollar_Box_Open: { url: "/models/Dollar_Box_Open.glb", scaleMultiplier: 30, rotate: [Math.PI / 2, Math.PI, 0] },
-    Black_XP: { url: "/models/Black_XP.glb", scaleMultiplier: 900, rotate: [Math.PI / 2, Math.PI, 0] },
+ Dollar_Box_Open: {
+        url: "/models/Dollar_Box_Open.glb",
+        scaleMultiplier:30,
+        rotate: [Math.PI / 2, Math.PI, 0],
+      },
+      Black_XP_2: {
+        url: "/models/Black_XP_3.glb",
+        scaleMultiplier: 700,
+        rotate: [Math.PI / 2, Math.PI, 0],
+      },
+      Pink_XP: {
+        url: "/models/XP_Pink_NEW.glb",
+        scaleMultiplier: 700,
+        rotate: [Math.PI / 2, Math.PI, 0],
+      },
+      Blue_XP: {
+        url: "/models/BlueXP.glb",
+        scaleMultiplier: 20,
+        rotate: [Math.PI / 2, Math.PI, 0],
+      },
   };
 
   // const sendToUnity = (messageObj: any) => {
@@ -298,7 +316,7 @@ const add3DMarkers = (markers: MarkerData[]) => {
   if (!mapRef.current) return;
   const map = mapRef.current;
 
-  const types = ["Dollar_Box_Open", "Black_XP"] as const;
+  const types = ["Dollar_Box_Open" , "Black_XP_2" , "Pink_XP" , "Blue_XP"] as const;
 
   markers.forEach((m) => {
     const type = m.type ?? types[Math.floor(Math.random() * types.length)];
