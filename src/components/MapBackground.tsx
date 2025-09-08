@@ -730,8 +730,8 @@ const treasureCoords: [number, number][] =
     // -----------------------------
     // Build models array
     // -----------------------------
-    let usedGroup1 = false;
-    let usedGroup2 = false;
+   let pickedFromGroup = false;
+
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
     const models = treasureCoords.map((coords, idx) => {
@@ -744,26 +744,22 @@ const treasureCoords: [number, number][] =
       // const type = types[Math.floor(Math.random() * types.length)];
       // const type = types[0];      
 // const type = types[[1, 2, 3][Math.floor(Math.random() * 3)]];
-
- const group1: ModelType[] = ["Dollar_Box_Open"];
-  const group2: ModelType[] = ["Black_XP_2"];
+ const group: ModelType[] = ["Dollar_Box_Open", "Black_XP_2"];
   const others: ModelType[] = ["Pink_XP", "Blue_XP"];
 
   let type: ModelType;
 
   if (isMobile) {
-    // --- Mobile logic: at most 1 from group1 + group2 ---
-    if (!usedGroup1 && Math.random() < 0.5) {
-      type = group1[0];
-      usedGroup1 = true;
-    } else if (!usedGroup2 && Math.random() < 0.5) {
-      type = group2[0];
-      usedGroup2 = true;
+    if (!pickedFromGroup && Math.random() < 0.5) {
+      // Pick one from the combined group, only once
+      type = group[Math.floor(Math.random() * group.length)];
+      pickedFromGroup = true;
     } else {
+      // Otherwise pick from others
       type = others[Math.floor(Math.random() * others.length)];
     }
   } else {
-    // --- Desktop logic: original random selection ---
+    // Desktop = fully random
     const types: ModelType[] = [
       "Dollar_Box_Open",
       "Black_XP_2",
@@ -772,7 +768,7 @@ const treasureCoords: [number, number][] =
     ];
     type = types[Math.floor(Math.random() * types.length)];
   }
-  
+
       const cfg = modelConfigs[type];
 
       return {
