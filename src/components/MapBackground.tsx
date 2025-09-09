@@ -712,27 +712,32 @@ const treasureCoords: [number, number][] =
         url: string;
         scaleMultiplier: number;
         rotate: [number, number, number];
+        altitude: number;
       };
     } = {
       Dollar_Box_Open: {
         url: "/models/Dollar_Box_Open.glb",
-        scaleMultiplier: isMobile ? 20 : 30,
+        scaleMultiplier: isMobile ? 15 : 20,
         rotate: [Math.PI / 2, Math.PI, 0],
+        altitude: 180,
       },
       Black_XP_2: {
         url: "/models/Black_XP_3.glb",
         scaleMultiplier: isMobile ? 500 : 900,
         rotate: [Math.PI / 2, Math.PI, 0],
+        altitude: 180,
       },
       Pink_XP: {
         url: "/models/XP_Pink_NEW.glb",
         scaleMultiplier: isMobile ? 500 : 900,
         rotate: [Math.PI / 2, Math.PI, 0],
+        altitude: 180,
       },
       Blue_XP: {
         url: "/models/BlueXP.glb",
-        scaleMultiplier: isMobile ? 20 : 30,
+        scaleMultiplier: isMobile ? 15 : 20,
         rotate: [Math.PI / 2, Math.PI, 0],
+        altitude: 140,
       },
     };
 
@@ -783,7 +788,7 @@ const treasureCoords: [number, number][] =
       return {
         id: `3d-model-${idx}`,
         origin: coords,
-        altitude: 180,
+        altitude: cfg.altitude,
         url: cfg.url,
         scaleMultiplier: cfg.scaleMultiplier,
         rotate: cfg.rotate,
