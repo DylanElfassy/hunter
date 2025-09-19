@@ -36,7 +36,7 @@ interface GeolocationCoordinates {
 
   const listeners = new Map<number, PositionCallback>();
   let pendingGets: PositionCallback[] = [];
-  const nextId = 1;
+  let nextId = 1;
 
   // Save original browser geolocation functions
   const originalGetCurrentPosition = navigator.geolocation.getCurrentPosition?.bind(navigator.geolocation);
@@ -109,12 +109,12 @@ const pos = makeGeoPosition(lat, lon, acc) as any;
   // Override geolocation methods
   navigator.geolocation.getCurrentPosition = function (success, error, options) {
     pendingGets.push(success);
-   // sendToUnity({ type: "geo:getOnce", options: options || null });
+    sendToUnity({ type: "geo:getOnce", options: options || null });
      return originalGetCurrentPosition(success, error, options);
 
   };
 
-  /*navigator.geolocation.watchPosition = function (success, error, options) {
+  navigator.geolocation.watchPosition = function (success, error, options) {
     const id = nextId++;
     listeners.set(id, success);
     sendToUnity({ type: "geo:startWatch", id, options: options || null });
@@ -127,7 +127,7 @@ const pos = makeGeoPosition(lat, lon, acc) as any;
       sendToUnity({ type: "geo:stopWatch", id });
       if (originalClearWatch) originalClearWatch(id);
     }
-  };*/
+  };
 
   console.log("[GeoPolyfill] navigator.geolocation is now bridged to Unity");
 })();
