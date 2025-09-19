@@ -12,9 +12,9 @@ export default function MapOnlyPage() {
   return (
     <main className="w-screen h-screen overflow-hidden">
       <MapBackground2 />
-        <div className="absolute top-4 left-4 z-50">
+       {/* <div className="absolute top-4 left-4 z-50">
         <UnitySimulator />
-      </div> 
+      </div>  */}
     </main>
   );
 }
