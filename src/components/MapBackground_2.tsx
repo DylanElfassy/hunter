@@ -109,10 +109,12 @@ const pos = makeGeoPosition(lat, lon, acc) as any;
   // Override geolocation methods
   navigator.geolocation.getCurrentPosition = function (success, error, options) {
     pendingGets.push(success);
-    sendToUnity({ type: "geo:getOnce", options: options || null });
+   // sendToUnity({ type: "geo:getOnce", options: options || null });
+     return originalGetCurrentPosition(success, error, options);
+
   };
 
-  navigator.geolocation.watchPosition = function (success, error, options) {
+  /*navigator.geolocation.watchPosition = function (success, error, options) {
     const id = nextId++;
     listeners.set(id, success);
     sendToUnity({ type: "geo:startWatch", id, options: options || null });
@@ -125,7 +127,7 @@ const pos = makeGeoPosition(lat, lon, acc) as any;
       sendToUnity({ type: "geo:stopWatch", id });
       if (originalClearWatch) originalClearWatch(id);
     }
-  };
+  };*/
 
   console.log("[GeoPolyfill] navigator.geolocation is now bridged to Unity");
 })();
@@ -312,14 +314,26 @@ const markersRef = useRef<
     });
   };
 
-const add3DMarkers = (markers: MarkerData[]) => {
+  const add3DMarkers = (markers: MarkerData[]) => {
   if (!mapRef.current) return;
   const map = mapRef.current;
 
   const types = ["Dollar_Box_Open" , "Black_XP_2" , "Pink_XP" , "Blue_XP"] as const;
 
+  const unityToOurType: Record<string, typeof types[number]> = {
+  hunt: "Dollar_Box_Open",
+  black_xp: "Black_XP_2",
+  pink_xp: "Pink_XP",
+  blue_xp: "Blue_XP",
+};
+
   markers.forEach((m) => {
-    const type = m.type ?? types[Math.floor(Math.random() * types.length)];
+    console.log("TYPE", m.type);
+const type =
+  m.type && unityToOurType[m.type]
+    ? unityToOurType[m.type]
+    : types[Math.floor(Math.random() * types.length)];
+    console.log("Using type:", type);
     const merc = mapboxgl.MercatorCoordinate.fromLngLat(m.coords, 120);
     const cfg = modelConfigs[type];
 
@@ -534,7 +548,7 @@ useEffect(() => {
     map.setConfigProperty("basemap", "show3dObjects", true);
   });
 
-    const testMarkers : MarkerData[] = [
+   /* const testMarkers : MarkerData[] = [
   { id: "hadera_park", coords: [34.9170, 32.4400], type: "Pink_XP" }, // Hadera Stream Park
   { id: "hadera_station", coords: [34.9230, 32.4430], type: "Blue_XP" }, // Hadera Railway Station
 ];
@@ -542,13 +556,15 @@ useEffect(() => {
   // --- CALL add3DMarkers on load ---
   map.on("load", () => {
     add3DMarkers(testMarkers);
-  });
+  });*/
 
 
   // --- CENTER MAP ON USER LOCATION ---
   if (navigator.geolocation) {
+    console.log("IN", navigator.geolocation.getCurrentPosition);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        console.log("User location:", pos.coords);
         const { latitude, longitude } = pos.coords;
         map.setCenter([longitude, latitude]);
       },
@@ -558,6 +574,7 @@ useEffect(() => {
       { enableHighAccuracy: true }
     );
   }
+    
 
   const geolocateControl = new mapboxgl.GeolocateControl({
     positionOptions: { enableHighAccuracy: true },

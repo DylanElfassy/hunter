@@ -24,8 +24,8 @@ const UnitySimulator = () => {
   // ];
 
   const sampleMarkers = [
-  { id: "hadera_park", coords: [34.9170, 32.4400], type: "Pink_XP" }, // Hadera Stream Park
-  { id: "hadera_station", coords: [34.9230, 32.4430], type: "Blue_XP" }, // Hadera Railway Station
+  { id: "hadera_park", coords: [34.9170, 32.4400], type: "hunt" }, // Hadera Stream Park
+  { id: "hadera_station", coords: [34.9230, 32.4430], type: "blue_xp" }, // Hadera Railway Station
 ];
 
   const sendAddMarkers = () => {
