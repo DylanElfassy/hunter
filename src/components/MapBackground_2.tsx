@@ -36,7 +36,7 @@ interface GeolocationCoordinates {
 
   const listeners = new Map<number, PositionCallback>();
   let pendingGets: PositionCallback[] = [];
-  let nextId = 1;
+  const nextId = 1;
 
   // Save original browser geolocation functions
   const originalGetCurrentPosition = navigator.geolocation.getCurrentPosition?.bind(navigator.geolocation);
