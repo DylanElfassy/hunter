@@ -1007,13 +1007,22 @@ const customLayer: mapboxgl.CustomLayerInterface = {
 
   return (
     <div className="absolute w-full h-full z-0">
-      {loading && (
-        <div className="flex items-center justify-center w-full h-full bg-black text-white z-10 absolute transition-opacity duration-700">
-          <span className="font-Unbounded text-3xl font-extrabold tracking-wide animate-pulse">
-            HUNTERZ
-          </span>
-        </div>
-      )}
+
+    {loading && ( <div className="flex items-center justify-center w-full h-full bg-black text-white z-10 absolute transition-opacity duration-700"> <span className="font-Unbounded text-3xl font-extrabold tracking-wide animate-pulse"> HUNTERZ </span> </div> )}
+  
+ <div
+  className={`absolute bottom-1/3 left-1/2 transform -translate-x-1/2 z-20 text-white text-center w-[90%] sm:w-[70%] md:w-[50%] px-4 transition-opacity duration-700 ${
+    loading ? "opacity-0" : "opacity-100"
+  }`}
+>
+  <h2 className="font-Unbounded uppercase text-2xl sm:text-3xl md:text-5xl font-bold tracking-widest">
+    A REAL-WORLD <br />
+    MONEY HUNTING <br />
+    GAME APP
+  </h2>
+</div>
+
+
       <div
         ref={mapContainer}
         className={`w-full h-full transition-opacity duration-700 ${
@@ -1025,188 +1034,3 @@ const customLayer: mapboxgl.CustomLayerInterface = {
 };
 
 export default MapBackground;
-
- // #endregion
-
-// "use client";
-
-// import React, { useEffect, useRef } from 'react';
-// import mapboxgl from 'mapbox-gl';
-// import 'mapbox-gl/dist/mapbox-gl.css';
-// import * as THREE from 'three';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-// const MapboxExample = () => {
-// const mapContainerRef = useRef<HTMLDivElement>(null);
-// const mapRef = useRef<mapboxgl.Map | null>(null);
-
-//   useEffect(() => {
-//     mapboxgl.accessToken = 
-//   'pk.eyJ1IjoiZHlsb3UyNzE5OTUiLCJhIjoiY21iZm1odjZtMmpmdTJrczFiZjI5dXJ6OCJ9.xrSFSyJODlBBw8OlBdSpSg';
-
-//       if (!mapContainerRef.current) return;
-
-//     const map = new mapboxgl.Map({
-//       container: mapContainerRef.current,
-//       style: "mapbox://styles/mapbox/standard",
-//       config: {
-//         basemap: {
-//          lightPreset: "dusk",
-//         }
-//       },
-//       zoom: 18,
-//       center: [148.9819, -35.3981],
-//       pitch: 60,
-//       antialias: true
-//     });
-
-// const modelOrigin: [number, number] = [148.9819, -35.39847];
-//     const modelAltitude = 50;
-//     const modelRotate = [Math.PI / 2, 0, 0];
-
-//     const modelAsMercatorCoordinate = mapboxgl.MercatorCoordinate.fromLngLat(
-//       modelOrigin,
-//       modelAltitude
-//     );
-
-//     const modelTransform = {
-//       translateX: modelAsMercatorCoordinate.x,
-//       translateY: modelAsMercatorCoordinate.y,
-//       translateZ: modelAsMercatorCoordinate.z,
-//       rotateX: modelRotate[0],
-//       rotateY: modelRotate[1],
-//       rotateZ: modelRotate[2],
-//       scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * 20
-//     };
-
-//     const createCustomLayer = (map: mapboxgl.Map): mapboxgl.CustomLayerInterface  => {
-//       const camera = new THREE.Camera();
-//       const scene = new THREE.Scene();
-
-//   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-// scene.add(ambientLight);
-
-// const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
-// directionalLight1.position.set(0, -70, 100).normalize();
-// scene.add(directionalLight1);
-
-// const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1.0);
-// directionalLight2.position.set(0, 70, 100).normalize();
-// scene.add(directionalLight2);
-
-//       const loader = new GLTFLoader();
-//       loader.load(
-//         '/models/box1.glb',
-//         (gltf) => {
-
-//           gltf.scene.traverse((child) => {
-//   if (child instanceof THREE.Mesh) {
-//     console.log('Mesh name:', child.name, child.material);
-//   }
-// });
-//      const mesh3 = gltf.scene.getObjectByName('Mesh_3');
-
-//   if (mesh3) {
-//     console.log('Mesh_3 found:', mesh3);
-//    mesh3.traverse((child) => {
-//   if (child instanceof THREE.Mesh) {
-//     const mat = child.material as THREE.MeshPhysicalMaterial;
-
-//     // Remove the texture
-//     mat.map = null;
-
-//     // Set base color
-//     mat.color.set(0xff0000);
-
-//     // Make it non-metallic and semi-rough
-//     mat.metalness = 0;
-//     mat.roughness = 0.5;
-
-//     // Optional: add emissive for extra brightness
-//     mat.emissive.set(0x550000);
-
-//     mat.needsUpdate = true;
-//   }
-// });
-//   }
-
-//           scene.add(gltf.scene);
-//         }
-//       );
-
-
-//       const renderer = new THREE.WebGLRenderer({
-//         canvas: map.getCanvas(),
-//         context: map.painter.context.gl,
-//         antialias: true
-//       });
-
-//       renderer.autoClear = false;
-//       (renderer as any).outputEncoding = (THREE as any).sRGBEncoding;
-// renderer.toneMapping = THREE.ACESFilmicToneMapping;
-// renderer.toneMappingExposure = 1.0;
-
-//       return {
-//         id: '3d-model',
-//         type: 'custom',
-//         renderingMode: '3d',
-//         onAdd: () => {
-//           // Add logic that runs on layer addition if necessary.
-//         },
-//         render: (gl, matrix) => {
-//           const rotationX = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(1, 0, 0),
-//             modelTransform.rotateX
-//           );
-//           const rotationY = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(0, 1, 0),
-//             modelTransform.rotateY
-//           );
-//           const rotationZ = new THREE.Matrix4().makeRotationAxis(
-//             new THREE.Vector3(0, 0, 1),
-//             modelTransform.rotateZ
-//           );
-
-//           const m = new THREE.Matrix4().fromArray(matrix);
-//           const l = new THREE.Matrix4()
-//             .makeTranslation(
-//               modelTransform.translateX,
-//               modelTransform.translateY,
-//               modelTransform.translateZ
-//             )
-//             .scale(
-//               new THREE.Vector3(
-//                 modelTransform.scale,
-//                 -modelTransform.scale,
-//                 modelTransform.scale
-//               )
-//             )
-//             .multiply(rotationX)
-//             .multiply(rotationY)
-//             .multiply(rotationZ);
-
-//           camera.projectionMatrix = m.multiply(l);
-//           renderer.resetState();
-            
-//           renderer.render(scene, camera);
-//           map.triggerRepaint();
-//         }
-//       };
-//     };
-
-//     map.on('style.load', () => {
-//       const customLayer = createCustomLayer(map);
-//       map.addLayer(customLayer);
-//     });
-
-//     mapRef.current = map;
-
-//     return () => map.remove();
-//   }, []);
-
-//   return (
-//     <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }}></div>
-//   );
-// };
-
-// export default MapboxExample;

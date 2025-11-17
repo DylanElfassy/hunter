@@ -1,15 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
-import appStoreImg from "@/assets/APPWhiteBG.png";
-import playStoreImg from "@/assets/PlayBG.png";
 import { Header } from "./Header"; // optional
 
-// Dynamically import the map to disable SSR
-const MapBackground = dynamic(() => import("./MapBackground"), {
-  ssr: false,
-});
+const MapBackground = dynamic(() => import("./MapBackground"), { ssr: false });
 
 const HeroMap = () => {
   return (
@@ -19,32 +13,19 @@ const HeroMap = () => {
       {/* Optional Header */}
       <Header />
 
-      {/* Hero Text and Buttons */}
-      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-20 text-white text-center mt-32 w-[90%] sm:w-[70%] md:w-[50%] px-4">
-        {/* <h1 className="font-bold uppercase font-Unbounded text-[25px] lg:text-[36px] xl:text-[46px]  leading-tight">
-          Hunterz is a real-world money hunting game — chase clues, find the cash, win big.
-        </h1> */}
+      {/* Hero Text */}
+      {/* <div className="absolute bottom-1/3 left-1/2 transform -translate-x-1/2 z-20 text-white text-center w-[90%] sm:w-[70%] md:w-[50%] px-4">
+        <h2 className="font-Unbounded uppercase text-2xl sm:text-3xl md:text-5xl font-bold tracking-widest">
+          A REAL-WORLD <br></br>MONEY HUNTING <br></br>GAME APP
+        </h2>
+      </div> */}
 
-        <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12">
-          <a href="https://apps.apple.com/your-app-id" target="_blank" rel="noopener noreferrer">
-            <Image
-              src={appStoreImg}
-              alt="Download on the App Store"
-              width={160}
-              height={50}
-              className="hover:scale-105 transition-transform"
-            />
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=your.app.id" target="_blank" rel="noopener noreferrer">
-            <Image
-              src={playStoreImg}
-              alt="Get it on Google Play"
-              width={160}
-              height={50}
-              className="hover:scale-105 transition-transform"
-            />
-          </a>
-        </div>
+      {/* Strong gradient overlay on top of text */}
+      <div className="absolute bottom-0 left-0 w-full h-1/2 z-30 pointer-events-none">
+        {/* Solid dark bottom */}
+        <div className="absolute bottom-0 w-full h-1/5 bg-[#040404]" />
+        {/* Strong gradient fading up */}
+        <div className="absolute bottom-1/5 w-full h-4/5 bg-gradient-to-t from-[#040404] via-[#040404]/80 to-transparent" />
       </div>
     </section>
   );

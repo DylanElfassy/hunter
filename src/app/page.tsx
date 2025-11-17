@@ -8,6 +8,12 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import MapBackground from "@/components/MapBackground";
 import HeroMap from "@/components/HeroMap";
+import KeyStep from "@/components/About";
+import ThunderzLeague from "@/components/Thunderz";
+import PremiumSection from "@/components/Premium_New";
+import BattleHunter from "@/components/BattleWorld";
+
+
 
 export const metadata = {
   title: "Hunterz",
@@ -21,10 +27,15 @@ export default function Home() {
       {/* <Hero /> */}
       
       <HeroMap />
-      <StepIntoGame />
-      <Premium />
+      {/* <StepIntoGame /> */}
+      <KeyStep />
+      {/* <Premium /> */}
+      <ThunderzLeague />
+      <PremiumSection />
+       <BattleHunter />
+       {/* <Premium />
       <ReferralSection />
-      <CTA />
+      <CTA /> */}
       <Footer />
 
     </main>

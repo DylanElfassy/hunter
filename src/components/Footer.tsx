@@ -9,35 +9,36 @@ import instagramIcon from "@/assets/Insta.png";
 
 export const Footer = () => {
   return (
-<footer className="w-full px-4 md:px-20 py-4 mb-8">
-<div className="mx-auto px-4 md:px-20 flex flex-col md:flex-row items-center justify-between gap-2 text-sm font-Jakarta text-black">        
+    <footer className="w-full bg-[#040404] px-4 md:px-20 py-8">
+      <div className="mx-auto px-4 md:px-20 flex flex-col md:flex-row items-center justify-between gap-2 text-sm font-Jakarta">
+        
         {/* Left: Copyright */}
-        <div className="font-semibold text-center md:text-left">
+        <div className="font-semibold text-[#545454] text-center md:text-left">
           All Rights Reserved © Hunterz
         </div>
 
-        {/* Center: Terms & Privacy (bold) */}
-        <div className="flex gap-4 justify-center font-semibold">
+        {/* Center: Terms & Privacy (bold, white) */}
+        <div className="flex gap-4 justify-center font-semibold text-white">
           <a href="/terms" className="hover:underline">Terms</a>
-          <span>|</span>
+          <span className="text-[#545454]">|</span>
           <a href="/privacy" className="hover:underline">Privacy</a>
-          <span>|</span>
+          <span className="text-[#545454]">|</span>
           <a href="/faq" className="hover:underline">FAQ</a>
         </div>
 
         {/* Right: Social Icons */}
         <div className="flex gap-3 justify-center md:justify-end">
           <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
-            <Image src={tiktokIcon} alt="TikTok" width={15} height={15} />
+            <Image src={tiktokIcon} alt="TikTok" width={15} height={15} className="text-[#545454]" />
           </a>
           <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-            <Image src={twitterIcon} alt="X (Twitter)" width={15} height={15} />
+            <Image src={twitterIcon} alt="X (Twitter)" width={15} height={15} className="text-[#545454]" />
           </a>
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-            <Image src={facebookIcon} alt="Facebook" width={15} height={15} />
+            <Image src={facebookIcon} alt="Facebook" width={15} height={15} className="text-[#545454]" />
           </a>
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-            <Image src={instagramIcon} alt="Instagram" width={15} height={15} />
+            <Image src={instagramIcon} alt="Instagram" width={15} height={15} className="text-[#545454]" />
           </a>
         </div>
 
@@ -45,4 +46,5 @@ export const Footer = () => {
     </footer>
   );
 };
+
 export default Footer;

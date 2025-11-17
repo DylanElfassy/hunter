@@ -560,20 +560,20 @@ useEffect(() => {
 
 
   // --- CENTER MAP ON USER LOCATION ---
-  if (navigator.geolocation) {
-    console.log("IN", navigator.geolocation.getCurrentPosition);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        console.log("User location:", pos.coords);
-        const { latitude, longitude } = pos.coords;
-        map.setCenter([longitude, latitude]);
-      },
-      (err) => {
-        console.warn("Could not get user location:", err);
-      },
-      { enableHighAccuracy: true }
-    );
-  }
+  // if (navigator.geolocation) {
+  //   console.log("IN", navigator.geolocation.getCurrentPosition);
+  //   navigator.geolocation.getCurrentPosition(
+  //     (pos) => {
+  //       console.log("User location:", pos.coords);
+  //       const { latitude, longitude } = pos.coords;
+  //       map.setCenter([longitude, latitude]);
+  //     },
+  //     (err) => {
+  //       console.warn("Could not get user location:", err);
+  //     },
+  //     { enableHighAccuracy: true }
+  //   );
+  // }
     
 
   const geolocateControl = new mapboxgl.GeolocateControl({
