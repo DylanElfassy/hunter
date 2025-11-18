@@ -76,7 +76,7 @@ const PremiumSection = () => {
   ];
 
   return (
-<section className="w-full bg-[#040404] pt-10 pb-20 px-6 2xl:px-32">
+<section className="w-full bg-[#040404] pt-10 pb-0 md:pb-20 px-6 2xl:px-32">
 
   {/* Image & Card Container */}
   <div className="relative w-full mb-10 flex justify-center">

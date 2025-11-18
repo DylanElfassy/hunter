@@ -4,7 +4,7 @@ import battleHunterImage from "../assets/battleword.png"; // Replace with your i
 
 const BattleHunter = () => {
   return (
-<section className="w-full bg-[#040404] pt-10 px-6 2xl:px-32 flex flex-col items-center">
+<section className="w-full bg-[#040404] pt-0 md:pt-10 px-6 2xl:px-32 flex flex-col items-center">
       
       {/* Text Container */}
       <div className="flex flex-col justify-center items-center px-4 sm:px-8 mt-10 space-y-6 text-center z-10 relative">
@@ -32,24 +32,67 @@ const BattleHunter = () => {
           </button>
         </div>
       </div>
+      
 
-      {/* Image */}
-      <div className="w-full relative mt-6 lg:mt-0">
-        <Image
-          src={battleHunterImage}
-          alt="Battle Hunter"
-          className="w-full rounded-2xl object-cover"
-          priority
-        />
+{/* Image Container */}
+<div className="w-full relative mt-6 lg:mt-0">
+  <Image
+    src={battleHunterImage}
+    alt="Battle Hunter"
+    className="w-full rounded-2xl object-cover"
+    priority
+  />
 
-        {/* Overlay button for lg+ screens */}
-        <div className="hidden lg:absolute top-10 left-1/2 transform -translate-x-1/2 w-1/3 sm:w-1/4 lg:flex">
-          <span className="absolute -inset-0.5 rounded-[30px] bg-gradient-to-r from-[#FF00BB] via-[#FF5C00] to-[#FF9D00]"></span>
-          <button className="relative z-10 w-full px-2 py-4 rounded-[30px] font-Unbounded font-bold uppercase text-white bg-[#040404]">
-            JOIN THE HUNT
-          </button>
-        </div>
-      </div>
+   {/* JOIN THE HUNT overlay */}
+  <div className="hidden lg:absolute top-10 left-1/2 -translate-x-1/2 w-1/3 sm:w-1/4 lg:flex">
+    <span className="absolute -inset-0.5 rounded-[30px] bg-gradient-to-r from-[#FF00BB] via-[#FF5C00] to-[#FF9D00]"></span>
+    <button className="relative z-10 w-full px-2 py-4 rounded-[30px] font-Unbounded font-bold uppercase text-white bg-[#040404]">
+      JOIN THE HUNT
+    </button>
+  </div>
+
+  {/* LG+ overlay */}
+  <div className="
+    hidden lg:flex
+    absolute bottom-6 left-1/2 -translate-x-1/2
+    bg-white rounded-2xl p-4 w-3/4
+    items-center justify-between shadow-lg
+  ">
+    <p className="font-Unbounded font-bold text-black uppercase text-sm">
+      Referral Program
+    </p>
+
+    <p className="font-Unbounded font-bold text-black uppercase text-center">
+      Share with pals and get a bonus
+    </p>
+
+    <button className="bg-[#040404] px-5 py-2 rounded-xl font-Unbounded font-bold uppercase">
+      <span className="bg-gradient-to-r from-[#FF00BB] via-[#FF5C00] to-[#FF9D00] bg-clip-text text-transparent">
+        SHARE
+      </span>
+    </button>
+  </div>
+</div>
+
+{/* Mobile & Tablet version (stacked below image) */}
+<div className="flex flex-col gap-2 text-center bg-white rounded-2xl p-4 mt-4 w-full sm:w-3/4 mx-auto lg:hidden">
+  {/* Left text smaller */}
+  <p className="font-Unbounded font-bold text-black uppercase text-xs">
+    Referral Program
+  </p>
+
+  {/* Center text bigger */}
+  <p className="font-Unbounded font-bold text-black uppercase text-sm">
+    Share with pals and get a bonus
+  </p>
+
+  {/* Button */}
+  <button className="bg-[#040404] px-4 py-2 rounded-xl font-Unbounded font-bold uppercase mx-auto">
+    <span className="bg-gradient-to-r from-[#FF00BB] via-[#FF5C00] to-[#FF9D00] bg-clip-text text-transparent">
+      SHARE
+    </span>
+  </button>
+</div>
 
     </section>
   );

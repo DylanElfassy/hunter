@@ -23,7 +23,7 @@ export const metadata = {
 export default function Home() {
   return (
     
-    <main>
+<main className="bg-[#040404]">
       {/* <Hero /> */}
       
       <HeroMap />
