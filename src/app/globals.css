@@ -217,3 +217,21 @@ body {
     background-size: cover; /* 1280px and wider */
   }
 }
+
+@keyframes fadeZoom {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeZoom {
+  animation: fadeZoom 0.6s cubic-bezier(0.45,0,0.55,1);
+}
+
+@keyframes centerSlide {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-centerSlide {
+  animation: centerSlide 0.7s cubic-bezier(0.45,0,0.55,1);
+}
