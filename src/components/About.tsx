@@ -14,8 +14,10 @@ const KeyStep = () => {
   const handleNext = () => setActiveImage((prev) => (prev + 1) % images.length);
 
   return (
-    <section className="relative w-full bg-[#040404] pt-5 pb-20 px-6 md:px-32 flex flex-col xl:flex-row gap-20">
-      
+<section
+  id="about"
+  className="relative w-full bg-[#040404] pt-5 pb-20 px-6 md:px-32 flex flex-col xl:flex-row gap-20"
+>      
       {/* Left side */}
    <div className="flex-1 flex flex-col justify-center items-center xl:items-start px-4 sm:px-8 mt-10 space-y-8 xl:space-y-4">
   {/* Gradient text */}

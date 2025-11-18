@@ -4,8 +4,10 @@ import thunderzImage from "../assets/ThunderzIMG.png"; // replace with your imag
 
 const ThunderzLeague = () => {
   return (
-<section className="relative w-full bg-[#040404] pt-5 pb-20 px-6 xl:px-32 flex flex-col xl:flex-row items-center">
-  
+<section
+  id="thunderz"
+  className="relative w-full bg-[#040404] pt-5 pb-20 px-6 xl:px-32 flex flex-col xl:flex-row items-center"
+>  
   {/* Left side - Image */}
   <div className="xl:w-3/5 flex justify-center items-center">
     <Image

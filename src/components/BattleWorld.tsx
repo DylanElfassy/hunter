@@ -4,7 +4,10 @@ import battleHunterImage from "../assets/battleword.png"; // Replace with your i
 
 const BattleHunter = () => {
   return (
-<section className="w-full bg-[#040404] pt-0 md:pt-10 px-6 2xl:px-32 flex flex-col items-center">
+<section
+  id="battle"
+  className="w-full bg-[#040404] pt-0 md:pt-10 px-6 2xl:px-32 flex flex-col items-center"
+>
       
       {/* Text Container */}
       <div className="flex flex-col justify-center items-center px-4 sm:px-8 mt-10 space-y-6 text-center z-10 relative">

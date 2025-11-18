@@ -22,14 +22,14 @@ export const Header: React.FC<HeaderProps> = ({
   navItems = [
     { label: "ABOUT", href: "#about" },
     { label: "PREMIUM", href: "#premium" },
-    { label: "LEADERSHIP", href: "#referral" },
-    { label: "SPONSOR", href: "#referral" },
+    { label: "THUNDERZ", href: "#thunderz" },
+    { label: "BATTLE", href: "#battle" },
   ],
   ctaLabel = "SIGNUP",
   ctaHref = "#signup",
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selected, setSelected] = useState(navItems[0].label);
+const [selected, setSelected] = useState<string | null>(null);
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 w-[93%] md:w-[97%] z-50 px-8 py-6 text-white bg-[#161616] rounded-[10px]">
