@@ -84,27 +84,28 @@ const KeyStep = () => {
       <div className="xl:w-1/2 bg-[#161616] rounded-xl p-4 sm:p-6 flex flex-col items-center space-y-4 md:space-y-6">
         
         {/* TITLE + DESCRIPTION with smoother fade */}
-        <div
-          key={activeImage}
-          className="
-            transition-all duration-700 
-            ease-[cubic-bezier(0.45,0,0.55,1)]
-            opacity-100 transform scale-100
-            animate-fadeZoom
-            flex flex-col items-center
-          "
-        >
-          <h4 className="font-Unbounded font-bold text-white text-[16px] text-center uppercase">
-            {details[activeImage].title}
-          </h4>
+       <div
+  key={activeImage}
+  className="
+    transition-all duration-700 
+    ease-[cubic-bezier(0.45,0,0.55,1)]
+    opacity-100 transform scale-100
+    animate-fadeZoom
+    flex flex-col items-center
+    pt-6        /* top padding for mobile */
+  "
+>
+  <h4 className="font-Unbounded font-bold text-white text-[16px] text-center uppercase mb-2">
+    {details[activeImage].title}
+  </h4>
 
-          <p className="font-['Plus_Jakarta_Sans'] text-[#FAF9F9] text-[16px] text-center opacity-[0.62] mt-1">
-            {details[activeImage].desc}
-          </p>
-        </div>
+  <p className="font-['Plus_Jakarta_Sans'] text-[#FAF9F9] text-[16px] text-center opacity-[0.62] mt-1 px-10">
+    {details[activeImage].desc}
+  </p>
+</div>
 
         {/* IMAGES */}
-        <div className="relative w-full mt-2 flex justify-center items-center min-h-[450px] sm:min-h-[500px]">
+        <div className="relative w-full mt-10 flex justify-center items-center ">
 
           {/* LEFT IMAGE */}
           <Image
